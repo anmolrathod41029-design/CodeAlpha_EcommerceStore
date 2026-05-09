@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CodeAlpha E-commerce Store</title>
+
+  <style>
+
+    body{
+      font-family: Arial;
+      background:#f2f2f2;
+      margin:0;
+      padding:0;
+      text-align:center;
+    }
+
+    header{
+      background:black;
+      color:white;
+      padding:20px;
+    }
+
+    .container{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:30px;
+    }
+
+    .product{
+      background:white;
+      width:250px;
+      margin:15px;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+    }
+
+    img{
+      width:100%;
+      border-radius:10px;
+    }
+
+    button{
+      background:green;
+      color:white;
+      border:none;
+      padding:10px 20px;
+      border-radius:5px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:darkgreen;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🛒 CodeAlpha Store</h1>
+</header>
+
+<div class="container">
+
+  <div class="product">
+    <img src="https://via.placeholder.com/250">
+    <h2>Smart Watch</h2>
+    <p>Price: ₹1999</p>
+    <button onclick="cart()">Add to Cart</button>
+  </div>
+
+  <div class="product">
+    <img src="https://via.placeholder.com/250">
+    <h2>Headphones</h2>
+    <p>Price: ₹999</p>
+    <button onclick="cart()">Add to Cart</button>
+  </div>
+
+</div>
+
+<script>
+
+function cart(){
+  alert("Product Added to Cart!");
+}
+
+</script>
+
+</body>
+</html>
