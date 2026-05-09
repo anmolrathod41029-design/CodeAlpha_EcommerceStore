@@ -7,22 +7,35 @@
 
     body{
       font-family: Arial;
-      background:#f2f2f2;
       margin:0;
       padding:0;
-      text-align:center;
+      background:#f2f2f2;
     }
 
-    header{
-      background:black;
+    nav{
+      background:#111;
       color:white;
-      padding:20px;
+      padding:15px;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    nav h2{
+      margin:0;
+    }
+
+    nav button{
+      background:orange;
+      border:none;
+      padding:10px;
+      border-radius:5px;
+      cursor:pointer;
     }
 
     .container{
       display:flex;
-      justify-content:center;
       flex-wrap:wrap;
+      justify-content:center;
       margin-top:30px;
     }
 
@@ -32,10 +45,11 @@
       margin:15px;
       padding:20px;
       border-radius:10px;
+      text-align:center;
       box-shadow:0 0 10px rgba(0,0,0,0.1);
     }
 
-    img{
+    .product img{
       width:100%;
       border-radius:10px;
     }
@@ -58,23 +72,31 @@
 
 <body>
 
-<header>
-  <h1>🛒 CodeAlpha Store</h1>
-</header>
+<nav>
+  <h2>🛒 CodeAlpha Store</h2>
+  <button onclick="openCart()">Cart 🛍</button>
+</nav>
 
 <div class="container">
 
   <div class="product">
     <img src="https://via.placeholder.com/250">
-    <h2>Smart Watch</h2>
-    <p>Price: ₹1999</p>
+    <h3>Smart Watch</h3>
+    <p>₹1999</p>
     <button onclick="cart()">Add to Cart</button>
   </div>
 
   <div class="product">
     <img src="https://via.placeholder.com/250">
-    <h2>Headphones</h2>
-    <p>Price: ₹999</p>
+    <h3>Headphones</h3>
+    <p>₹999</p>
+    <button onclick="cart()">Add to Cart</button>
+  </div>
+
+  <div class="product">
+    <img src="https://via.placeholder.com/250">
+    <h3>Shoes</h3>
+    <p>₹1499</p>
     <button onclick="cart()">Add to Cart</button>
   </div>
 
@@ -84,6 +106,10 @@
 
 function cart(){
   alert("Product Added to Cart!");
+}
+
+function openCart(){
+  alert("Cart Page Coming Soon!");
 }
 
 </script>
