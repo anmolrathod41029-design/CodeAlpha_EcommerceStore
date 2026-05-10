@@ -1,8 +1,11 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CodeAlpha Store - FULL STACK PRO</title><style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CodeAlpha Store - Final Pro</title>
+
+<style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#f4f4f4;transition:0.3s;}
 .dark{background:#111;color:white;}
@@ -12,18 +15,17 @@ background:#111;color:white;
 display:flex;justify-content:space-between;
 align-items:center;
 padding:15px;
-position:sticky;top:0;z-index:1000;
+position:sticky;top:0;
 flex-wrap:wrap;
 }
 
 nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-nav input{padding:8px;border-radius:8px;border:none;outline:none;}
+nav input{padding:8px;border:none;border-radius:8px;}
 nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
 
 .hero{
 background:linear-gradient(to right,#111,#444);
-color:white;
-text-align:center;
+color:white;text-align:center;
 padding:50px 20px;
 }
 
@@ -46,164 +48,218 @@ position:relative;
 
 .product img{width:100%;height:200px;object-fit:cover;}
 .product-content{text-align:center;padding:12px;}
-.price{color:green;font-size:18px;font-weight:bold;}
+.price{color:green;font-weight:bold;}
 .desc{font-size:13px;color:#555;margin:6px 0;}
 
-.btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+.btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;margin:3px;}
 .cart-btn{background:green;color:white;}
-.delete-btn{background:red;color:white;margin-top:5px;}
+.del-btn{background:red;color:white;}
 
 .section{background:white;margin:20px;padding:20px;border-radius:15px;}
 
-.toast{position:fixed;bottom:20px;right:20px;background:black;color:white;padding:10px;border-radius:10px;display:none;}
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+}
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
+.modal-content{
+background:white;
+padding:20px;
+border-radius:10px;
+width:320px;
+position:relative;
+text-align:center;
+}
 
-.modal-content{background:white;padding:20px;border-radius:10px;width:320px;text-align:center;position:relative;}
+.close{
+position:absolute;
+top:5px;right:10px;
+cursor:pointer;
+font-size:18px;
+}
 
 .modal-content input{width:100%;padding:8px;margin:5px 0;}
 
-.close{position:absolute;right:10px;top:5px;cursor:pointer;font-size:18px;}
+.sample{
+margin-top:10px;
+background:#f2f2f2;
+padding:10px;
+border-radius:8px;
+font-size:13px;
+}
 
-.sample{margin-top:10px;padding:10px;background:#f2f2f2;border-radius:8px;font-size:13px;}
+</style>
+</head>
+<body>
 
-</style></head>
-<body><nav>
-<h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
-<input id="search" placeholder="Search products" onkeyup="renderProducts()" />
-<button onclick="toggleMode()">🌙</button>
-<button onclick="openAuth()">Login/Register</button>
+<nav>
+<h2>🛒 CodeAlpha Store</h2>
+
+<div class="right">
+<input id="search" placeholder="Search" onkeyup="renderProducts()"/>
+<button onclick="toggle()">🌙</button>
+<button onclick="openAuth()">Login</button>
 <button onclick="openAdmin()">Admin</button>
 <span id="user"></span>
 <button>🛍 <span id="count">0</span></button>
 </div>
-</nav><section class="hero">
-<h2>Full Stack E-Commerce System</h2>
-<p>Firebase Ready • Razorpay Ready • Admin Dashboard</p>
-</section><div class="container" id="productList"></div><div class="section">
+</nav>
+
+<section class="hero">
+<h1>Final E-Commerce Project</h1>
+<p>Full Stack Simulation System</p>
+</section>
+
+<div class="container" id="products"></div>
+
+<div class="section">
 <h2>Cart</h2>
-<ul id="cartItems"></ul>
+<ul id="cart"></ul>
 <p>Total: ₹<span id="total">0</span></p>
-<button onclick="checkout()">Checkout (Mock)</button>
-</div><div class="section">
-<h2>Orders</h2>
-<div id="orders"></div>
-</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><!-- AUTH --><div class="modal" id="authModal">
+<button onclick="checkout()">Checkout</button>
+</div>
+
+<!-- LOGIN -->
+<div class="modal" id="auth">
 <div class="modal-content">
 <span class="close" onclick="closeAuth()">✖</span>
-<h3 id="authTitle">Login</h3>
-<input id="email" placeholder="Username" />
-<input id="pass" type="password" placeholder="Password" />
+<h3>Login</h3>
+<input id="u" placeholder="Username">
+<input id="p" type="password" placeholder="Password">
 <button onclick="login()">Submit</button>
-<p onclick="toggleAuth()" style="cursor:pointer;color:blue">Switch Login/Register</p><div class="sample">
+
+<div class="sample">
 <b>Sample Login</b><br>
 Username: admin<br>
 Password: admin123
 </div>
 </div>
-</div><!-- ADMIN --><div class="modal" id="adminModal">
+</div>
+
+<!-- ADMIN -->
+<div class="modal" id="admin">
 <div class="modal-content">
 <span class="close" onclick="closeAdmin()">✖</span>
 <h3>Admin Panel</h3>
-<input id="pname" placeholder="Product Name" />
-<input id="pprice" placeholder="Price" />
-<input id="pimg" placeholder="Image URL" />
-<input id="pdesc" placeholder="Description" />
-<button onclick="addProduct()">Add Product</button>
+<input id="n" placeholder="Name">
+<input id="pr" placeholder="Price">
+<input id="img" placeholder="Image URL">
+<input id="d" placeholder="Description">
+<button onclick="add()">Add Product</button>
 </div>
-</div><script>
+</div>
+
+<script>
 
 let products = JSON.parse(localStorage.getItem("products")) || [
-{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness smartwatch"},
-{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking & heart rate monitor"},
+{name:"Headphones",price:1499,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"},
+{name:"Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Comfortable running shoes"},
+{name:"Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",desc:"High performance smartphone"},
+{name:"Laptop",price:45999,img:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",desc:"Powerful laptop"},
+{name:"Mouse",price:799,img:"https://images.unsplash.com/photo-1527814050087-3793815479db?w=500",desc:"Gaming mouse"},
+{name:"Keyboard",price:999,img:"https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500",desc:"Mechanical keyboard"},
+{name:"Backpack",price:699,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",desc:"Travel backpack"},
+{name:"Speaker",price:1299,img:"https://images.unsplash.com/photo-1589003077984-894e133dabab?w=500",desc:"Bluetooth speaker"},
+{name:"TV",price:27999,img:"https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500",desc:"4K Smart TV"},
+{name:"Watch",price:999,img:"https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=500",desc:"Classic watch"},
+{name:"Perfume",price:899,img:"https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500",desc:"Long lasting fragrance"},
+{name:"Camera",price:32999,img:"https://images.unsplash.com/photo-1519183071298-a2962be96f83?w=500",desc:"DSLR camera"},
+{name:"Sunglasses",price:499,img:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500",desc:"UV protection glasses"},
+{name:"Smart Band",price:1299,img:"https://images.unsplash.com/photo-1510017803434-a899398421b3?w=500",desc:"Fitness tracker"}
 ];
 
 let cart=[];
 let user=localStorage.getItem("user");
-let orders=JSON.parse(localStorage.getItem("orders"))||{};
-let isLogin=true;
 
-renderProducts();updateUI();renderOrders();
+renderProducts();
 
 function renderProducts(){
-let box=document.getElementById("productList");
-let s=document.getElementById("search")?.value?.toLowerCase()||"";
+let box=document.getElementById("products");
+let s=document.getElementById("search").value.toLowerCase();
 box.innerHTML="";
 
 products.filter(p=>p.name.toLowerCase().includes(s)).forEach((p,i)=>{
 box.innerHTML+=`
-<div class='product'>
-<img src='${p.img}'/>
-<div class='product-content'>
+<div class="product">
+<img src="${p.img}">
+<div class="product-content">
 <h3>${p.name}</h3>
-<p class='desc'>${p.desc}</p>
-<p class='price'>₹${p.price}</p>
-<button class='btn cart-btn' onclick='add(${i})'>Add</button>
-<button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>
-</div></div>`;
+<p class="desc">${p.desc}</p>
+<p class="price">₹${p.price}</p>
+<button class="btn cart-btn" onclick="add(${i})">Add</button>
+<button class="btn del-btn" onclick="del(${i})">Delete</button>
+</div>
+</div>`;
 });
 }
 
-function add(i){if(!user)return alert("Login required");cart.push(products[i]);updateCart();}
+function add(i){
+if(!user)return alert("Login required");
+cart.push(products[i]);
+update();
+}
 
-function deleteProduct(i){
-if(user!="admin")return alert("Only admin can delete");
+function del(i){
+if(user!=="admin")return alert("Only admin");
 products.splice(i,1);
 localStorage.setItem("products",JSON.stringify(products));
 renderProducts();
 }
 
-function updateCart(){
+function update(){
 document.getElementById("count").innerText=cart.length;
 let t=0;
-document.getElementById("cartItems").innerHTML="";
-cart.forEach(c=>{t+=c.price;document.getElementById("cartItems").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;});
+document.getElementById("cart").innerHTML="";
+cart.forEach(c=>{
+t+=c.price;
+document.getElementById("cart").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
+});
 document.getElementById("total").innerText=t;
 }
 
-function checkout(){if(!cart.length)return;
-let id="ORD"+Date.now();
-let total=cart.reduce((a,b)=>a+b.price,0);
-alert("Processing...");
-setTimeout(()=>{
-if(!orders[user])orders[user]=[];
-orders[user].push({id,total});
-localStorage.setItem("orders",JSON.stringify(orders));
-cart=[];updateCart();renderOrders();alert("Order: "+id);
-},1000);
+function checkout(){
+alert("Order placed!");
+cart=[];
+update();
 }
 
-function renderOrders(){let box=document.getElementById("orders");box.innerHTML="";
-if(!orders[user])return;
-orders[user].forEach(o=>box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`);
-}
+function toggle(){document.body.classList.toggle("dark");}
 
-function toggleMode(){document.body.classList.toggle("dark");}
-function openAuth(){document.getElementById("authModal").style.display="flex";}
-function closeAuth(){document.getElementById("authModal").style.display="none";}
-function openAdmin(){document.getElementById("adminModal").style.display="flex";}
-function closeAdmin(){document.getElementById("adminModal").style.display="none";}
+function openAuth(){document.getElementById("auth").style.display="flex";}
+function closeAuth(){document.getElementById("auth").style.display="none";}
 
-function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").innerText=isLogin?"Login":"Register";}
+function openAdmin(){document.getElementById("admin").style.display="flex";}
+function closeAdmin(){document.getElementById("admin").style.display="none";}
 
 function login(){
-let e=document.getElementById("email").value;
-let p=document.getElementById("pass").value;
-if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();}
-else alert("Invalid");
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
+
+if(u==="admin" && p==="admin123" || (u && p)){
+user=u;
+localStorage.setItem("user",u);
+closeAuth();
+document.getElementById("user").innerText="👤 "+u;
+}else alert("Invalid");
 }
 
-function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
+function add(){
+let n=document.getElementById("n").value;
+let pr=document.getElementById("pr").value;
+let img=document.getElementById("img").value;
+let d=document.getElementById("d").value;
 
-function addProduct(){
-let n=document.getElementById("pname").value;
-let p=document.getElementById("pprice").value;
-let i=document.getElementById("pimg").value;
-let d=document.getElementById("pdesc").value;
-products.push({name:n,price:+p,img:i,desc:d});
+products.push({name:n,price:+pr,img,desc:d});
 localStorage.setItem("products",JSON.stringify(products));
-renderProducts();alert("Added");
+renderProducts();
+alert("Added");
 }
 
-</script></body>
+</script>
+</body>
 </html>
