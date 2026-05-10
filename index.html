@@ -49,6 +49,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         
         .history-item { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); text-align: left; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; background: var(--success); color: white; }
     </style>
 </head>
 <body>
@@ -56,7 +57,7 @@
 <nav>
     <div class="logo" onclick="showPage('home')">EliteCommerce</div>
     <div class="nav-right">
-        <input type="text" id="search" placeholder="Search premium collection..." onkeyup="renderProducts()">
+        <input type="text" id="search" placeholder="Search 13 items..." onkeyup="renderProducts()">
         <button class="btn" style="background:none; color:white;" onclick="toggleTheme()">🌓</button>
         <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 Cart: <span id="cart-count">0</span></button>
         <button class="btn btn-outline" style="border-color:white; color:white;" onclick="checkAuth('history')">📜 Orders</button>
@@ -64,7 +65,7 @@
     </div>
 </nav>
 
-<div id="loading"><div class="spinner"></div><h2 style="margin-top:20px;">Securing Order...</h2></div>
+<div id="loading"><div class="spinner"></div><h2 style="margin-top:20px;">Processing Order...</h2></div>
 
 <div id="auth" class="page">
     <div class="box">
@@ -78,7 +79,7 @@
 </div>
 
 <div id="home" class="page active-page">
-    <h2 style="text-align: center; margin-bottom: 20px;">Top Rated Tech & Lifestyle</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">Elite Curated Collection</h2>
     <div class="grid" id="product-grid"></div>
 </div>
 
@@ -96,17 +97,17 @@
 
 <div id="details" class="page">
     <div class="box">
-        <h2>Delivery Information</h2>
-        <input type="text" id="c-name" placeholder="Full Name">
+        <h2>Shipping Information</h2>
+        <input type="text" id="c-name" placeholder="Receiver Full Name">
         <input type="email" id="c-email" placeholder="Email Address">
         <div style="display: flex; gap: 10px;">
             <input type="text" id="c-phone" placeholder="Primary Phone" style="flex: 1;">
             <input type="text" id="c-alt" placeholder="Alt Phone (Optional)" style="flex: 1;">
         </div>
-        <textarea id="c-addr" placeholder="House/Office No, Street, Area" rows="3"></textarea>
+        <textarea id="c-addr" placeholder="Flat No, Street Name, Landmark" rows="3"></textarea>
         <select id="c-type">
             <option value="Home">Residential (Home)</option>
-            <option value="Office">Office / Workplace</option>
+            <option value="Office">Office / Workspace</option>
         </select>
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="validateDetails()">Continue to Payment</button>
     </div>
@@ -114,21 +115,21 @@
 
 <div id="payment" class="page">
     <div class="box">
-        <h2>Payment Mode</h2>
+        <h2>Secure Payment</h2>
         <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
             <input type="radio" name="pm" value="UPI" checked> Instant UPI Transfer
         </label>
         <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
             <input type="radio" name="pm" value="COD"> Cash on Delivery
         </label>
-        <button class="btn btn-primary" style="width: 100%;" onclick="processOrder()">Place Order</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="processOrder()">Complete Order</button>
     </div>
 </div>
 
 <div id="history" class="page">
     <div style="display:flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 30px;">
         <h2>Order History</h2>
-        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 8px 15px;" onclick="clearHistory()">Clear All</button>
+        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 8px 15px;" onclick="clearHistory()">Clear History</button>
     </div>
     <div id="order-history-list" style="max-width: 800px; margin: 0 auto;"></div>
 </div>
@@ -137,7 +138,7 @@
     <div class="box" style="text-align:center;">
         <h1 style="color:var(--success)">🎉 Order Confirmed!</h1>
         <p>Reference ID: <b id="final-tid"></b></p>
-        <button class="btn btn-primary" style="margin-top: 20px;" onclick="showPage('home')">Continue Shopping</button>
+        <button class="btn btn-primary" style="margin-top: 20px;" onclick="showPage('home')">Return Home</button>
     </div>
 </div>
 
@@ -145,16 +146,21 @@
 const sampleUsers = {"admin": "123"};
 let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
 
-// VERIFIED PRODUCTS: STARTING WITH RED SHOES & IPAD
+// 13 VERIFIED PRODUCTS: NO PLACEHOLDERS, ONLY REAL IMAGES
 const products = [
-    { id: 1, name: "Red Turbo Runners", price: 4500, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800", desc: "Performance shoes with breathable mesh and responsive cushioning." },
-    { id: 2, name: "iPad Pro 12.9", price: 92000, img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800", desc: "Liquid Retina XDR display with M2 chip power." },
-    { id: 3, name: "Studio Monitor 4K", price: 34500, img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800", desc: "Ultrawide IPS panel for professional color grading." },
-    { id: 4, name: "Elite Noise-Cancel Pods", price: 12499, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", desc: "Pure studio sound with Active Noise Cancellation." },
-    { id: 5, name: "Premium Aviators", price: 2200, img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800", desc: "Classic UV400 protection with polarized lenses." },
-    { id: 6, name: "Precision Pro Laptop", price: 74999, img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800", desc: "High-performance processing for intensive tasks." },
-    { id: 7, name: "Titan Gaming Mouse", price: 2999, img: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800", desc: "16k DPI sensor with customizable macro buttons." },
-    { id: 8, name: "Executive Leather Bag", price: 5800, img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800", desc: "Handcrafted genuine leather for the modern professional." }
+    { id: 1, name: "Red Turbo Runners", price: 4500, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800", desc: "Top-tier performance footwear with lightweight soles." },
+    { id: 2, name: "iPad Pro 12.9", price: 92000, img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800", desc: "Liquid Retina display with powerful M2 processing." },
+    { id: 3, name: "Elite Noise-Cancel Pods", price: 12499, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", desc: "High-fidelity audio with Active Noise Cancellation." },
+    { id: 4, name: "Studio Monitor 4K", price: 34500, img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800", desc: "Vivid 4K IPS display for professional design work." },
+    { id: 5, name: "Executive Leather Bag", price: 5800, img: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800", desc: "Premium genuine leather for the modern professional." },
+    { id: 6, name: "Gaming Console v5", price: 49999, img: "https://images.unsplash.com/photo-1486401899868-0e435ed85128?w=800", desc: "Next-gen gaming experience with 4K resolution." },
+    { id: 7, name: "Professional DSLR", price: 82000, img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800", desc: "High-resolution sensor for cinematic photography." },
+    { id: 8, name: "Minimalist Desk Lamp", price: 1999, img: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=800", desc: "Eye-care LED lighting for productive workspaces." },
+    { id: 9, name: "Precision Pro Laptop", price: 74999, img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800", desc: "Sleek aluminum body with ultra-fast performance." },
+    { id: 10, name: "Smart Fitness Watch", price: 6999, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800", desc: "Oxygen tracking and real-time heart rate monitoring." },
+    { id: 11, name: "Titan Gaming Mouse", price: 2999, img: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800", desc: "Ergonomic design with ultra-responsive sensors." },
+    { id: 12, name: "Premium Aviators", price: 2200, img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800", desc: "Timeless style with full UV400 lens protection." },
+    { id: 13, name: "Solid Wood Workdesk", price: 18000, img: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=800", desc: "Sturdy oak construction for a luxury home office." }
 ];
 
 let cart = [];
@@ -167,6 +173,7 @@ function renderProducts() {
     const q = document.getElementById("search").value.toLowerCase();
     grid.innerHTML = "";
     
+    // Strict Filtering: If image fails to load, the card is hidden via onerror
     products.filter(p => p.name.toLowerCase().includes(q)).forEach(p => {
         const inCart = cart.some(c => c.id === p.id);
         grid.innerHTML += `
@@ -206,17 +213,18 @@ function updateCart() {
     document.getElementById("subtotal").innerText = "₹" + sub;
     document.getElementById("gst").innerText = "₹" + tax;
     document.getElementById("sum-total").innerText = "₹" + (sub + tax);
-    list.innerHTML = cart.length ? cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('') : "<p style='text-align:center'>Cart is empty</p>";
+    list.innerHTML = cart.length ? cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('') : "<p style='text-align:center'>Your cart is empty</p>";
 }
 
 function validateDetails() {
-    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("Fill Name, Phone, and Address!");
+    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("All fields are mandatory!");
     showPage('payment');
 }
 
 function processOrder() {
-    const tid = "ID-" + Date.now();
-    const order = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, count: cart.length, type: document.getElementById("c-type").value };
+    const tid = "ELITE-" + Date.now();
+    const type = document.getElementById("c-type").value;
+    const order = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, count: cart.length, type: type };
     document.getElementById("loading").style.display = "flex";
     setTimeout(() => {
         if(!allOrders[currentUser]) allOrders[currentUser] = [];
@@ -233,7 +241,7 @@ function renderHistory() {
     const list = document.getElementById("order-history-list");
     const btn = document.getElementById("clear-btn");
     list.innerHTML = "";
-    if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) { btn.style.display = "none"; return list.innerHTML = "<p style='text-align:center'>No history yet.</p>"; }
+    if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) { btn.style.display = "none"; return list.innerHTML = "<p style='text-align:center'>No history found.</p>"; }
     btn.style.display = "block";
     allOrders[currentUser].slice().reverse().forEach(o => {
         list.innerHTML += `<div class="history-item"><div style="display:flex; justify-content:space-between"><b>Order #${o.id}</b><span class="status-badge">${o.type} Delivery</span></div><p>Qty: ${o.count} | Amount: ${o.total}</p><small>${o.date}</small></div>`;
