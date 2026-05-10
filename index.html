@@ -1,190 +1,228 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeAlpha FULL STACK</title>
-    <style>
-        /* General Reset & Body Styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CodeAlpha Store - FULL STACK PRO</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+body{background:#f4f4f4;transition:0.3s;}
+.dark{background:#111;color:white;}
 
-        /* Navbar Styles */
-        .navbar {
-            background-color: #121212;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-        }
-        .navbar-brand {
-            font-size: 24px;
-            font-weight: bold;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .search-bar {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            flex-grow: 1;
-            max-width: 250px;
-        }
-        .nav-btn {
-            background-color: #ffaa00;
-            color: #000;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .icon-btn {
-            background-color: #ffaa00;
-            border: none;
-            padding: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: white;
-            font-weight: bold;
-            margin: 0 10px;
-        }
+nav{
+background:#111;color:white;
+display:flex;justify-content:space-between;
+align-items:center;
+padding:15px;
+position:sticky;top:0;z-index:1000;
+flex-wrap:wrap;
+}
 
-        /* Product Grid Styles */
-        .container {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .product-card {
-            background-color: white;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 350px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            text-align: center;
-            padding-bottom: 15px;
-        }
-        .product-card img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            background-color: #eaeaea; /* Fallback color */
-        }
-        .product-title {
-            font-size: 20px;
-            margin: 15px 0 5px;
-            font-weight: bold;
-        }
-        .product-desc {
-            color: #666;
-            font-size: 14px;
-            margin: 0 0 10px;
-        }
-        .product-price {
-            color: #008000;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .btn-add {
-            background-color: #008000;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-delete {
-            background-color: #ff0000;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+nav input{padding:8px;border-radius:8px;border:none;outline:none;}
+nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
 
-    <nav class="navbar">
-        <div class="navbar-brand">
-            🛒 CodeAlpha FULL STACK
-        </div>
-        <input type="text" class="search-bar" placeholder="Search products">
-        <button class="icon-btn">🌙</button>
-        <button class="nav-btn">Login/Register</button>
-        <button class="nav-btn">Admin</button>
-        <div class="user-info">
-            👤 admin
-        </div>
-        <button class="nav-btn">🛍️ 0</button>
-    </nav>
+.hero{
+background:linear-gradient(to right,#111,#444);
+color:white;
+text-align:center;
+padding:50px 20px;
+}
 
-    <div class="container">
-        
-        <div class="product-card">
-            <img src="smart-watch.jpg" alt="Smart Watch">
-            <div class="product-title">Smart Watch</div>
-            <div class="product-desc">Fitness tracking & heart rate monitor</div>
-            <div class="product-price">₹1999</div>
-            <div class="btn-group">
-                <button class="btn-add">Add</button>
-                <button class="btn-delete">Delete</button>
-            </div>
-        </div>
+.container{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+justify-content:center;
+padding:25px;
+}
 
-        <div class="product-card">
-            <img src="headphones.jpg" alt="Headphones">
-            <div class="product-title">Headphones</div>
-            <div class="product-desc">Noise cancelling audio</div>
-            <div class="product-price">₹1499</div>
-            <div class="btn-group">
-                <button class="btn-add">Add</button>
-                <button class="btn-delete">Delete</button>
-            </div>
-        </div>
+.product{
+background:white;
+width:260px;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+position:relative;
+}
 
-        <div class="product-card">
-            <img src="smart-band.jpg" alt="Smart Band">
-            <div class="product-title">Smart Band</div>
-            <div class="product-desc">Fitness tracker</div>
-            <div class="product-price">₹1299</div>
-            <div class="btn-group">
-                <button class="btn-add">Add</button>
-                <button class="btn-delete">Delete</button>
-            </div>
-        </div>
+.product img{width:100%;height:200px;object-fit:cover;background:#eaeaea;}
+.product-content{text-align:center;padding:12px;}
+.price{color:green;font-size:18px;font-weight:bold;}
+.desc{font-size:13px;color:#555;margin:6px 0;}
 
-    </div>
+.btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+.cart-btn{background:green;color:white;}
+.delete-btn{background:red;color:white;margin-top:5px;}
 
-</body>
+.section{background:white;margin:20px;padding:20px;border-radius:15px;}
+
+.toast{position:fixed;bottom:20px;right:20px;background:black;color:white;padding:10px;border-radius:10px;display:none;}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
+
+.modal-content{background:white;padding:20px;border-radius:10px;width:320px;text-align:center;position:relative;}
+
+.modal-content input{width:100%;padding:8px;margin:5px 0;}
+
+.close{position:absolute;right:10px;top:5px;cursor:pointer;font-size:18px;}
+
+.sample{margin-top:10px;padding:10px;background:#f2f2f2;border-radius:8px;font-size:13px;}
+
+</style></head>
+<body><nav>
+<h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
+<input id="search" placeholder="Search products" onkeyup="renderProducts()" />
+<button onclick="toggleMode()">🌙</button>
+<button onclick="openAuth()">Login/Register</button>
+<button onclick="openAdmin()">Admin</button>
+<span id="user"></span>
+<button>🛍 <span id="count">0</span></button>
+</div>
+</nav><section class="hero">
+<h2>Full Stack E-Commerce System</h2>
+<p>Firebase Ready • Razorpay Ready • Admin Dashboard</p>
+</section><div class="container" id="productList"></div><div class="section">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<p>Total: ₹<span id="total">0</span></p>
+<button onclick="checkout()">Checkout (Mock)</button>
+</div><div class="section">
+<h2>Orders</h2>
+<div id="orders"></div>
+</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><div class="modal" id="authModal">
+<div class="modal-content">
+<span class="close" onclick="closeAuth()">✖</span>
+<h3 id="authTitle">Login</h3>
+<input id="email" placeholder="Username" />
+<input id="pass" type="password" placeholder="Password" />
+<button onclick="login()">Submit</button>
+<p onclick="toggleAuth()" style="cursor:pointer;color:blue">Switch Login/Register</p><div class="sample">
+<b>Sample Login</b><br>
+Username: admin<br>
+Password: admin123
+</div>
+</div>
+</div><div class="modal" id="adminModal">
+<div class="modal-content">
+<span class="close" onclick="closeAdmin()">✖</span>
+<h3>Admin Panel</h3>
+<input id="pname" placeholder="Product Name" />
+<input id="pprice" type="number" placeholder="Price" />
+<input id="pimg" placeholder="Image URL" />
+<input id="pdesc" placeholder="Description" />
+<button onclick="addProduct()">Add Product</button>
+</div>
+</div><script>
+
+let products = JSON.parse(localStorage.getItem("products")) || [
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness smartwatch"},
+{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
+];
+
+let cart=[];
+let user=localStorage.getItem("user");
+let orders=JSON.parse(localStorage.getItem("orders"))||{};
+let isLogin=true;
+
+renderProducts();updateUI();renderOrders();
+
+function renderProducts(){
+    let box=document.getElementById("productList");
+    let s=document.getElementById("search")?.value?.toLowerCase()||"";
+    box.innerHTML="";
+
+    // Added a filter to ONLY show products that have a name AND a price greater than 0
+    products.filter(p => p.name && p.price > 0 && p.name.toLowerCase().includes(s)).forEach((p,i)=>{
+        box.innerHTML+=`
+        <div class='product'>
+        <img src='${p.img}' onerror="this.src='https://via.placeholder.com/260x200?text=No+Image'"/>
+        <div class='product-content'>
+        <h3>${p.name}</h3>
+        <p class='desc'>${p.desc}</p>
+        <p class='price'>₹${p.price}</p>
+        <button class='btn cart-btn' onclick='add(${i})'>Add</button>
+        <button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>
+        </div></div>`;
+    });
+}
+
+function add(i){if(!user)return alert("Login required");cart.push(products[i]);updateCart();}
+
+function deleteProduct(i){
+    if(user!="admin")return alert("Only admin can delete");
+    products.splice(i,1);
+    localStorage.setItem("products",JSON.stringify(products));
+    renderProducts();
+}
+
+function updateCart(){
+    document.getElementById("count").innerText=cart.length;
+    let t=0;
+    document.getElementById("cartItems").innerHTML="";
+    cart.forEach(c=>{t+=c.price;document.getElementById("cartItems").innerHTML+=`<li>${c.name} - ₹${c.price}</li>`;});
+    document.getElementById("total").innerText=t;
+}
+
+function checkout(){
+    if(!cart.length)return;
+    let id="ORD"+Date.now();
+    let total=cart.reduce((a,b)=>a+b.price,0);
+    alert("Processing...");
+    setTimeout(()=>{
+        if(!orders[user])orders[user]=[];
+        orders[user].push({id,total});
+        localStorage.setItem("orders",JSON.stringify(orders));
+        cart=[];updateCart();renderOrders();alert("Order: "+id);
+    },1000);
+}
+
+function renderOrders(){
+    let box=document.getElementById("orders");box.innerHTML="";
+    if(!orders[user])return;
+    orders[user].forEach(o=>box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`);
+}
+
+function toggleMode(){document.body.classList.toggle("dark");}
+function openAuth(){document.getElementById("authModal").style.display="flex";}
+function closeAuth(){document.getElementById("authModal").style.display="none";}
+function openAdmin(){document.getElementById("adminModal").style.display="flex";}
+function closeAdmin(){document.getElementById("adminModal").style.display="none";}
+
+function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").innerText=isLogin?"Login":"Register";}
+
+function login(){
+    let e=document.getElementById("email").value;
+    let p=document.getElementById("pass").value;
+    if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();}
+    else alert("Invalid Credentials");
+}
+
+function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
+
+function addProduct(){
+    let n=document.getElementById("pname").value.trim();
+    let p=document.getElementById("pprice").value;
+    let i=document.getElementById("pimg").value.trim();
+    let d=document.getElementById("pdesc").value.trim();
+
+    // Validation added here: Prevent adding if name is empty or price is invalid
+    if(!n || !p || p <= 0) {
+        alert("Please enter a valid Product Name and Price greater than 0.");
+        return;
+    }
+
+    products.push({name:n,price:+p,img:i,desc:d});
+    localStorage.setItem("products",JSON.stringify(products));
+    renderProducts();
+    
+    // Clear admin inputs after adding
+    document.getElementById("pname").value = "";
+    document.getElementById("pprice").value = "";
+    document.getElementById("pimg").value = "";
+    document.getElementById("pdesc").value = "";
+    
+    alert("Product Added Successfully");
+    closeAdmin();
+}
+
+</script></body>
 </html>
