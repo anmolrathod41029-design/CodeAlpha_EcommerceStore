@@ -1,547 +1,264 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>CodeAlpha E-commerce Store</title>
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      background:#f4f4f4;
-      transition:0.3s;
-    }
-
-    .dark{
-      background:#111;
-      color:white;
-    }
-
-    nav{
-      background:#111;
-      color:white;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:15px 20px;
-      position:sticky;
-      top:0;
-      z-index:1000;
-    }
-
-    nav h1{
-      font-size:22px;
-    }
-
-    nav .nav-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    nav input{
-      padding:8px;
-      border:none;
-      border-radius:8px;
-      outline:none;
-    }
-
-    nav button{
-      background:orange;
-      border:none;
-      padding:10px 15px;
-      border-radius:8px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .hero{
-      background:linear-gradient(to right,#111,#444);
-      color:white;
-      text-align:center;
-      padding:60px 20px;
-    }
-
-    .hero h2{
-      font-size:40px;
-      margin-bottom:10px;
-    }
-
-    .hero p{
-      font-size:18px;
-    }
-
-    .container{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:20px;
-      padding:30px;
-    }
-
-    .product{
-      background:white;
-      width:280px;
-      border-radius:15px;
-      overflow:hidden;
-      box-shadow:0 0 10px rgba(0,0,0,0.2);
-      transition:0.3s;
-    }
-
-    .product:hover{
-      transform:scale(1.05);
-    }
-
-    .product img{
-      width:100%;
-      height:220px;
-      object-fit:cover;
-    }
-
-    .product-content{
-      padding:15px;
-      text-align:center;
-    }
-
-    .badge{
-      background:red;
-      color:white;
-      padding:5px 10px;
-      border-radius:20px;
-      font-size:12px;
-      display:inline-block;
-      margin-bottom:10px;
-    }
-
-    .product-content h3{
-      margin-bottom:10px;
-    }
-
-    .price{
-      color:green;
-      font-size:22px;
-      font-weight:bold;
-      margin-bottom:10px;
-    }
-
-    .rating{
-      color:gold;
-      margin-bottom:10px;
-    }
-
-    .btn-group{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      margin-top:15px;
-    }
-
-    .btn{
-      border:none;
-      padding:10px 15px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .cart-btn{
-      background:green;
-      color:white;
-    }
-
-    .buy-btn{
-      background:#111;
-      color:white;
-    }
-
-    .cart-section{
-      background:white;
-      margin:30px;
-      padding:25px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .cart-section h2{
-      margin-bottom:20px;
-    }
-
-    #cartItems li{
-      list-style:none;
-      background:#f2f2f2;
-      margin-bottom:10px;
-      padding:10px;
-      border-radius:8px;
-    }
-
-    .total{
-      margin-top:20px;
-      font-size:24px;
-      font-weight:bold;
-      color:green;
-    }
-
-    .place-order{
-      margin-top:20px;
-      background:orange;
-      border:none;
-      padding:12px 20px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:16px;
-      font-weight:bold;
-    }
-
-    footer{
-      background:#111;
-      color:white;
-      text-align:center;
-      padding:20px;
-      margin-top:30px;
-    }
-
-    .toast{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:black;
-      color:white;
-      padding:15px;
-      border-radius:10px;
-      display:none;
-    }
-
-  </style>
-</head>
-
-<body>
-
-  <nav>
-
-    <h1>🛒 CodeAlpha Store</h1>
-
-    <div class="nav-right">
-
-      <input
-        type="text"
-        id="search"
-        placeholder="Search Product"
-        onkeyup="searchProducts()"
-      >
-
-      <button onclick="toggleMode()">
-        🌙
-      </button>
-
-      <button>
-        Cart 🛍 (<span id="count">0</span>)
-      </button>
-
-    </div>
-
-  </nav>
-
-
-  <section class="hero">
-
-    <h2>Welcome to CodeAlpha Store</h2>
-
-    <p>Best Deals on Electronics & Fashion</p>
-
-  </section>
-
-
-  <div class="container">
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Smart Watch</h3>
-
-        <p class="price">₹1999</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Premium smart watch with fitness tracking.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Smart Watch',1999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Smart Watch')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Headphones</h3>
-
-        <p class="price">₹999</p>
-
-        <div class="rating">★★★★☆</div>
-
-        <p>Wireless noise cancellation headphones.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Headphones',999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Headphones')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Running Shoes</h3>
-
-        <p class="price">₹2499</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Comfortable running shoes for daily use.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Running Shoes',2499)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Running Shoes')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Smart Phone</h3>
-
-        <p class="price">₹14999</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Latest smartphone with amazing camera quality.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Smart Phone',14999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Smart Phone')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-
-  <section class="cart-section">
-
-    <h2>🛍 Shopping Cart</h2>
-
-    <ul id="cartItems"></ul>
-
-    <div class="total">
-      Total: ₹<span id="total">0</span>
-    </div>
-
-    <button class="place-order" onclick="placeOrder()">
-      Place Order
-    </button>
-
-  </section>
-
-
-
-  <footer>
-
-    <p>© 2026 CodeAlpha E-commerce Store | Made by Anmol</p>
-
-  </footer>
-
-
-
-  <div id="toast" class="toast">
-    Product Added Successfully ✅
-  </div>
-
-
-
-  <script>
-
-    let cartCount = 0;
-
-    let totalPrice = 0;
-
-
-
-    function addToCart(product, price){
-
-      cartCount++;
-
-      document.getElementById("count").innerText = cartCount;
-
-      totalPrice += price;
-
-      document.getElementById("total").innerText = totalPrice;
-
-      let li = document.createElement("li");
-
-      li.innerHTML = product + " - ₹" + price;
-
-      document.getElementById("cartItems").appendChild(li);
-
-      showToast();
-    }
-
-
-
-    function buyNow(product){
-
-      alert("Redirecting to payment for " + product);
-
-    }
-
-
-
-    function placeOrder(){
-
-      if(cartCount === 0){
-
-        alert("Your cart is empty!");
-
-      }
-
-      else{
-
-        alert("Order placed successfully!");
-
-      }
-
-    }
-
-
-
-    function toggleMode(){
-
-      document.body.classList.toggle("dark");
-
-    }
-
-
-
-    function showToast(){
-
-      let toast = document.getElementById("toast");
-
-      toast.style.display = "block";
-
-      setTimeout(() => {
-
-        toast.style.display = "none";
-
-      },2000);
-
-    }
-
-
-
-    function searchProducts(){
-
-      let input = document.getElementById("search").value.toLowerCase();
-
-      let products = document.getElementsByClassName("product");
-
-      for(let i=0;i<products.length;i++){
-
-        let title = products[i].innerText.toLowerCase();
-
-        if(title.includes(input)){
-
-          products[i].style.display = "block";
-
-        }
-
-        else{
-
-          products[i].style.display = "none";
-
-        }
-
-      }
-
-    }
-
-  </script>
-
-</body>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CodeAlpha Store - Pro Version</title><style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+body{background:#f4f4f4;transition:0.3s;}
+.dark{background:#111;color:white;}
+
+nav{
+background:#111;color:white;
+display:flex;justify-content:space-between;
+align-items:center;
+padding:15px;
+position:sticky;top:0;
+z-index:1000;
+flex-wrap:wrap;
+}
+
+nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+nav input{padding:8px;border-radius:8px;border:none;outline:none;}
+nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
+
+.hero{
+background:linear-gradient(to right,#111,#444);
+color:white;
+text-align:center;
+padding:50px 20px;
+}
+
+.container{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+justify-content:center;
+padding:25px;
+}
+
+.product{
+background:white;
+width:260px;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+.product img{width:100%;height:200px;object-fit:cover;}
+.product-content{text-align:center;padding:12px;}
+.price{color:green;font-size:18px;font-weight:bold;}
+
+.btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+.cart-btn{background:green;color:white;}
+.buy-btn{background:#111;color:white;}
+
+.section{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:15px;
+}
+
+.toast{
+position:fixed;
+bottom:20px;
+right:20px;
+background:black;
+color:white;
+padding:10px;
+border-radius:10px;
+display:none;
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:white;
+padding:20px;
+border-radius:10px;
+width:300px;
+}
+
+.modal-content input{width:100%;padding:8px;margin:5px 0;}
+
+</style></head>
+<body><nav>
+<h1>🛒 CodeAlpha Store</h1><div class="right">
+<input id="search" placeholder="Search products" onkeyup="renderProducts()" />
+<button onclick="toggleMode()">🌙</button>
+<button onclick="openAuth()">Login</button>
+<button onclick="logout()">Logout</button>
+<span id="user"></span>
+<button>🛍 <span id="count">0</span></button>
+</div>
+</nav><section class="hero">
+<h2>Pro E-Commerce System</h2>
+<p>Login • Cart • Orders • Admin Ready</p>
+</section><div class="container" id="productList"></div><div class="section">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<p>Total: ₹<span id="total">0</span></p>
+<input id="coupon" placeholder="Coupon (SAVE10)" />
+<button onclick="applyCoupon()">Apply</button>
+<button onclick="placeOrder()">Place Order</button>
+</div><div class="section">
+<h2>Orders</h2>
+<div id="orders"></div>
+</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Pro</footer><div class="toast" id="toast">Done ✔</div><!-- AUTH --><div class="modal" id="authModal">
+<div class="modal-content">
+<h3 id="title">Login</h3>
+<input id="u" placeholder="Username" />
+<input id="p" type="password" placeholder="Password" />
+<button onclick="authSubmit()">Submit</button>
+<p onclick="toggleModeAuth()" style="cursor:pointer;color:blue">Switch</p>
+</div>
+</div><!-- PAYMENT --><div class="modal" id="payModal">
+<div class="modal-content">
+<h3>Processing Payment...</h3>
+<p id="payText"></p>
+</div>
+</div><script>
+
+let products=[
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500"},
+{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"},
+{name:"Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"},
+{name:"Smart Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500"}
+];
+
+let cart=[];
+let users=JSON.parse(localStorage.getItem("users")||"{}");
+let currentUser=localStorage.getItem("user");
+let orders=JSON.parse(localStorage.getItem("orders")||"{}");
+let login=true;
+let discount=0;
+
+renderProducts();
+updateUI();
+renderOrders();
+
+function renderProducts(){
+let box=document.getElementById("productList");
+let s=document.getElementById("search").value?.toLowerCase()||"";
+box.innerHTML="";
+
+products.filter(p=>p.name.toLowerCase().includes(s)).forEach((p,i)=>{
+box.innerHTML+=`
+<div class='product'>
+<img src='${p.img}'/>
+<div class='product-content'>
+<h3>${p.name}</h3>
+<p class='price'>₹${p.price}</p>
+<button class='btn cart-btn' onclick='add(${i})'>Add</button>
+</div></div>`;
+});
+}
+
+function add(i){
+if(!currentUser)return alert("Login required");
+cart.push(products[i]);
+updateCart();
+toast();
+}
+
+function updateCart(){
+document.getElementById("count").innerText=cart.length;
+let t=0;
+document.getElementById("cartItems").innerHTML="";
+cart.forEach(c=>{
+t+=c.price;
+document.getElementById("cartItems").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
+});
+if(discount) t=t-(t*discount);
+document.getElementById("total").innerText=Math.round(t);
+}
+
+function applyCoupon(){
+let c=document.getElementById("coupon").value;
+if(c=="SAVE10"){discount=0.1;alert("10% Applied");}
+updateCart();
+}
+
+function placeOrder(){
+if(!cart.length)return alert("Cart empty");
+
+let id="ORD"+Date.now();
+
+let total=cart.reduce((a,b)=>a+b.price,0);
+if(discount) total-=total*discount;
+
+showPayment(id,total);
+
+setTimeout(()=>{
+if(!orders[currentUser])orders[currentUser]=[];
+orders[currentUser].push({id,total,items:[...cart]});
+localStorage.setItem("orders",JSON.stringify(orders));
+cart=[];
+discount=0;
+updateCart();
+renderOrders();
+},2000);
+}
+
+function showPayment(id,total){
+document.getElementById("payModal").style.display="flex";
+document.getElementById("payText").innerText=`Order ${id} | ₹${total}`;
+setTimeout(()=>document.getElementById("payModal").style.display="none",2000);
+}
+
+function renderOrders(){
+let box=document.getElementById("orders");
+box.innerHTML="";
+if(!orders[currentUser])return;
+orders[currentUser].forEach(o=>{
+box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`;
+});
+}
+
+function toggleMode(){document.body.classList.toggle("dark");}
+
+function toast(){
+document.getElementById("toast").style.display="block";
+setTimeout(()=>document.getElementById("toast").style.display="none",1200);
+}
+
+function openAuth(){document.getElementById("authModal").style.display="flex";}
+
+function toggleModeAuth(){login=!login;document.getElementById("title").innerText=login?"Login":"Register";}
+
+function authSubmit(){
+let u=document.getElementById("u").value;
+let p=document.getElementById("p").value;
+
+if(login){
+if(users[u]==p){
+currentUser=u;
+localStorage.setItem("user",u);
+document.getElementById("authModal").style.display="none";
+updateUI();
+}
+else alert("Login failed (try admin/admin123 or create account)");
+}else{
+users[u]=p;
+localStorage.setItem("users",JSON.stringify(users));
+alert("Registered");
+toggleModeAuth();
+}
+}
+
+function logout(){currentUser=null;localStorage.removeItem("user");updateUI();}
+
+function updateUI(){document.getElementById("user").innerText=currentUser?"👤 "+currentUser:"";}
+
+// default admin
+users["admin"]="admin123";
+
+</script></body>
 </html>
