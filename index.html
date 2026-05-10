@@ -130,7 +130,6 @@ function renderProducts(){
     let s=document.getElementById("search")?.value?.toLowerCase()||"";
     box.innerHTML="";
 
-    // Added a filter to ONLY show products that have a name AND a price greater than 0
     products.filter(p => p.name && p.price > 0 && p.name.toLowerCase().includes(s)).forEach((p,i)=>{
         box.innerHTML+=`
         <div class='product'>
@@ -162,17 +161,22 @@ function updateCart(){
     document.getElementById("total").innerText=t;
 }
 
+// Updated Checkout Function (Instant processing & new message)
 function checkout(){
-    if(!cart.length)return;
-    let id="ORD"+Date.now();
-    let total=cart.reduce((a,b)=>a+b.price,0);
-    alert("Processing...");
-    setTimeout(()=>{
-        if(!orders[user])orders[user]=[];
-        orders[user].push({id,total});
-        localStorage.setItem("orders",JSON.stringify(orders));
-        cart=[];updateCart();renderOrders();alert("Order: "+id);
-    },1000);
+    if(!cart.length) return;
+    
+    let id = "ORD" + Date.now();
+    let total = cart.reduce((a,b) => a + b.price, 0);
+    
+    if(!orders[user]) orders[user] = [];
+    orders[user].push({id, total});
+    localStorage.setItem("orders", JSON.stringify(orders));
+    
+    cart = [];
+    updateCart();
+    renderOrders();
+    
+    alert("Order is placed and payment is successful!\nOrder ID: " + id);
 }
 
 function renderOrders(){
@@ -192,7 +196,7 @@ function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").inne
 function login(){
     let e=document.getElementById("email").value;
     let p=document.getElementById("pass").value;
-    if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();}
+    if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();renderOrders();}
     else alert("Invalid Credentials");
 }
 
@@ -204,7 +208,6 @@ function addProduct(){
     let i=document.getElementById("pimg").value.trim();
     let d=document.getElementById("pdesc").value.trim();
 
-    // Validation added here: Prevent adding if name is empty or price is invalid
     if(!n || !p || p <= 0) {
         alert("Please enter a valid Product Name and Price greater than 0.");
         return;
@@ -214,7 +217,6 @@ function addProduct(){
     localStorage.setItem("products",JSON.stringify(products));
     renderProducts();
     
-    // Clear admin inputs after adding
     document.getElementById("pname").value = "";
     document.getElementById("pprice").value = "";
     document.getElementById("pimg").value = "";
