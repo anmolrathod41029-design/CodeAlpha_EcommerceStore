@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CodeAlpha Store - Pro Version</title><style>
+<title>CodeAlpha Store - FULL STACK PRO</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#f4f4f4;transition:0.3s;}
 .dark{background:#111;color:white;}
@@ -12,8 +12,7 @@ background:#111;color:white;
 display:flex;justify-content:space-between;
 align-items:center;
 padding:15px;
-position:sticky;top:0;
-z-index:1000;
+position:sticky;top:0;z-index:1000;
 flex-wrap:wrap;
 }
 
@@ -51,7 +50,6 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 
 .btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
 .cart-btn{background:green;color:white;}
-.buy-btn{background:#111;color:white;}
 
 .section{
 background:white;
@@ -84,62 +82,70 @@ align-items:center;
 background:white;
 padding:20px;
 border-radius:10px;
-width:300px;
+width:320px;
+text-align:center;
 }
 
 .modal-content input{width:100%;padding:8px;margin:5px 0;}
 
+.sample{
+margin-top:10px;
+padding:10px;
+background:#f2f2f2;
+border-radius:8px;
+font-size:13px;
+color:#333;
+}
+
 </style></head>
 <body><nav>
-<h1>🛒 CodeAlpha Store</h1><div class="right">
+<h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
 <input id="search" placeholder="Search products" onkeyup="renderProducts()" />
 <button onclick="toggleMode()">🌙</button>
 <button onclick="openAuth()">Login</button>
-<button onclick="logout()">Logout</button>
+<button onclick="openAdmin()">Admin</button>
 <span id="user"></span>
 <button>🛍 <span id="count">0</span></button>
 </div>
 </nav><section class="hero">
-<h2>Pro E-Commerce System</h2>
-<p>Login • Cart • Orders • Admin Ready</p>
+<h2>Full Stack E-Commerce System</h2>
+<p>Firebase Ready • Razorpay Ready • Admin Dashboard</p>
 </section><div class="container" id="productList"></div><div class="section">
 <h2>Cart</h2>
 <ul id="cartItems"></ul>
 <p>Total: ₹<span id="total">0</span></p>
-<input id="coupon" placeholder="Coupon (SAVE10)" />
-<button onclick="applyCoupon()">Apply</button>
-<button onclick="placeOrder()">Place Order</button>
+<button onclick="checkout()">Checkout (Razorpay Mock)</button>
 </div><div class="section">
 <h2>Orders</h2>
 <div id="orders"></div>
-</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Pro</footer><div class="toast" id="toast">Done ✔</div><!-- AUTH --><div class="modal" id="authModal">
+</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><!-- AUTH --><div class="modal" id="authModal">
 <div class="modal-content">
-<h3 id="title">Login</h3>
-<input id="u" placeholder="Username" />
-<input id="p" type="password" placeholder="Password" />
-<button onclick="authSubmit()">Submit</button>
-<p onclick="toggleModeAuth()" style="cursor:pointer;color:blue">Switch</p>
-</div>
-</div><!-- PAYMENT --><div class="modal" id="payModal">
+<h3>Login</h3><input id="email" placeholder="Email" />
+<input id="pass" type="password" placeholder="Password" />
+<button onclick="login()">Login</button><div class="sample">
+<b>Sample Login (For Testing)</b><br>
+Username: admin<br>
+Password: admin123
+</div></div>
+</div><!-- ADMIN --><div class="modal" id="adminModal">
 <div class="modal-content">
-<h3>Processing Payment...</h3>
-<p id="payText"></p>
+<h3>Admin Panel</h3>
+<input id="pname" placeholder="Product Name" />
+<input id="pprice" placeholder="Price" />
+<input id="pimg" placeholder="Image URL" />
+<input id="pdesc" placeholder="Description" />
+<button onclick="addProduct()">Add Product</button>
 </div>
 </div><script>
 
-let products=[
-{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking, heart rate monitor & smart notifications"},
-{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling wireless headphones with deep bass"},
-{name:"Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Comfortable running shoes for daily wear & sports"},
-{name:"Smart Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",desc:"Latest smartphone with high performance camera"}
+let products = JSON.parse(localStorage.getItem("products")) || [
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking smartwatch"},
+{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
 ];
 
 let cart=[];
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-let currentUser=localStorage.getItem("user");
-let orders=JSON.parse(localStorage.getItem("orders")||"{}");
-let login=true;
-let discount=0;
+let user=localStorage.getItem("user");
+let orders=JSON.parse(localStorage.getItem("orders"))||{};
 
 renderProducts();
 updateUI();
@@ -147,7 +153,7 @@ renderOrders();
 
 function renderProducts(){
 let box=document.getElementById("productList");
-let s=document.getElementById("search").value?.toLowerCase()||"";
+let s=document.getElementById("search")?.value?.toLowerCase()||"";
 box.innerHTML="";
 
 products.filter(p=>p.name.toLowerCase().includes(s)).forEach((p,i)=>{
@@ -164,10 +170,9 @@ box.innerHTML+=`
 }
 
 function add(i){
-if(!currentUser)return alert("Login required");
+if(!user)return alert("Login required");
 cart.push(products[i]);
 updateCart();
-toast();
 }
 
 function updateCart(){
@@ -178,88 +183,69 @@ cart.forEach(c=>{
 t+=c.price;
 document.getElementById("cartItems").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
 });
-if(discount) t=t-(t*discount);
-document.getElementById("total").innerText=Math.round(t);
+document.getElementById("total").innerText=t;
 }
 
-function applyCoupon(){
-let c=document.getElementById("coupon").value;
-if(c=="SAVE10"){discount=0.1;alert("10% Applied");}
-updateCart();
-}
-
-function placeOrder(){
-if(!cart.length)return alert("Cart empty");
-
-let id="ORD"+Date.now();
-
+function checkout(){
+if(!cart.length)return;
+let orderId="ORD"+Date.now();
 let total=cart.reduce((a,b)=>a+b.price,0);
-if(discount) total-=total*discount;
 
-showPayment(id,total);
+alert("Processing payment...");
 
 setTimeout(()=>{
-if(!orders[currentUser])orders[currentUser]=[];
-orders[currentUser].push({id,total,items:[...cart]});
+if(!orders[user])orders[user]=[];
+orders[user].push({orderId,total,items:[...cart]});
 localStorage.setItem("orders",JSON.stringify(orders));
 cart=[];
-discount=0;
 updateCart();
 renderOrders();
-},2000);
-}
-
-function showPayment(id,total){
-document.getElementById("payModal").style.display="flex";
-document.getElementById("payText").innerText=`Order ${id} | ₹${total}`;
-setTimeout(()=>document.getElementById("payModal").style.display="none",2000);
+alert("Payment Success! Order ID: "+orderId);
+},1500);
 }
 
 function renderOrders(){
 let box=document.getElementById("orders");
 box.innerHTML="";
-if(!orders[currentUser])return;
-orders[currentUser].forEach(o=>{
-box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`;
+if(!orders[user])return;
+orders[user].forEach(o=>{
+box.innerHTML+=`<p>🧾 ${o.orderId} | ₹${o.total}</p>`;
 });
 }
 
 function toggleMode(){document.body.classList.toggle("dark");}
 
-function toast(){
-document.getElementById("toast").style.display="block";
-setTimeout(()=>document.getElementById("toast").style.display="none",1200);
-}
+function toast(){document.getElementById("toast").style.display="block";setTimeout(()=>document.getElementById("toast").style.display="none",1000);}
 
 function openAuth(){document.getElementById("authModal").style.display="flex";}
 
-function toggleModeAuth(){login=!login;document.getElementById("title").innerText=login?"Login":"Register";}
+function login(){
+let e=document.getElementById("email").value;
+let p=document.getElementById("pass").value;
 
-function authSubmit(){
-let u=document.getElementById("u").value;
-let p=document.getElementById("p").value;
-
-if(login){
-if(users[u]==p){
-currentUser=u;
-localStorage.setItem("user",u);
+if((e=="admin" && p=="admin123") || (e && p)){
+user=e;
+localStorage.setItem("user",e);
 document.getElementById("authModal").style.display="none";
 updateUI();
-}
-else alert("Login failed (try admin/admin123 or create account)");
-}else{
-users[u]=p;
-localStorage.setItem("users",JSON.stringify(users));
-alert("Registered");
-toggleModeAuth();
-}
+}else alert("Invalid login");
 }
 
-function logout(){currentUser=null;localStorage.removeItem("user");updateUI();}
+function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
 
-function updateUI(){document.getElementById("user").innerText=currentUser?"👤 "+currentUser:"";}
+function openAdmin(){document.getElementById("adminModal").style.display="flex";}
 
-users["admin"]="admin123";
+function addProduct(){
+let n=document.getElementById("pname").value;
+let p=document.getElementById("pprice").value;
+let i=document.getElementById("pimg").value;
+let d=document.getElementById("pdesc").value;
+
+products.push({name:n,price:Number(p),img:i,desc:d});
+localStorage.setItem("products",JSON.stringify(products));
+renderProducts();
+alert("Product Added");
+}
 
 </script></body>
 </html>
