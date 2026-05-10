@@ -41,7 +41,7 @@
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         
         .box { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 550px; margin: 0 auto; }
-        input, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; background: var(--card); color: var(--text); }
+        input, textarea, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; background: var(--card); color: var(--text); font-size: 0.95rem; }
 
         .history-item { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); text-align: left; }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; background: var(--success); color: white; }
@@ -58,7 +58,7 @@
 <nav>
     <div class="logo" onclick="showPage('home')">EliteCommerce</div>
     <div class="nav-right">
-        <input type="text" id="search" placeholder="Search tech..." onkeyup="renderProducts()">
+        <input type="text" id="search" placeholder="Search 528 items..." onkeyup="renderProducts()">
         <button class="btn" style="background:none; color:white;" onclick="toggleTheme()">🌓</button>
         <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 Cart: <span id="cart-count">0</span></button>
         <button class="btn btn-outline" style="border-color:white; color:white;" onclick="checkAuth('history')">📜 Orders</button>
@@ -66,7 +66,7 @@
     </div>
 </nav>
 
-<div id="loading"><div class="spinner"></div><h2 style="margin-top:20px;">Processing...</h2></div>
+<div id="loading"><div class="spinner"></div><h2 style="margin-top:20px;">Securing Order...</h2></div>
 
 <div id="auth" class="page">
     <div class="box">
@@ -78,7 +78,7 @@
             <strong>Sample Credentials:</strong><br>
             User: <code>admin</code> | Pass: <code>123</code>
         </div>
-        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Don't have an account? Register</p>
+        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Switch to Register</p>
     </div>
 </div>
 
@@ -93,16 +93,28 @@
         <div id="cart-items-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;"></div>
         <hr><br>
         <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.2rem;"><span>Total</span><b id="sum-total">₹0</b></div>
-        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Shipping Details →</button>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Next: Delivery Details →</button>
     </div>
 </div>
 
 <div id="details" class="page">
     <div class="box">
-        <h2>Shipping Address</h2>
-        <input type="text" id="c-name" placeholder="Receiver Name">
-        <textarea id="c-addr" placeholder="Full Address" rows="3"></textarea>
-        <button class="btn btn-primary" style="width: 100%;" onclick="showPage('payment')">Payment →</button>
+        <h2>Delivery Information</h2>
+        <input type="text" id="c-name" placeholder="Full Name">
+        <input type="email" id="c-email" placeholder="Email Address">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="c-phone" placeholder="Primary Phone Number" style="flex: 1;">
+            <input type="text" id="c-alt-phone" placeholder="Alternate Phone (Optional)" style="flex: 1;">
+        </div>
+        <textarea id="c-addr" placeholder="Full Residential / Office Address" rows="3"></textarea>
+        
+        <label style="font-size: 0.85rem; color: #777; margin-top: 10px; display: block;">Address Type:</label>
+        <select id="c-type">
+            <option value="Residential">Residential (Home)</option>
+            <option value="Office">Office / Commercial</option>
+        </select>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="validateDetails()">Proceed to Payment</button>
     </div>
 </div>
 
@@ -121,7 +133,7 @@
 
 <div id="history" class="page">
     <div style="display:flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 30px;">
-        <h2>Your Order History</h2>
+        <h2>Order History</h2>
         <button id="clear-history-btn" class="btn btn-danger" style="display:none; padding: 8px 15px; font-size: 0.8rem;" onclick="clearHistory()">Clear History</button>
     </div>
     <div id="order-history-list" style="max-width: 800px; margin: 0 auto;"></div>
@@ -130,11 +142,11 @@
 <div id="success" class="page">
     <div class="box" style="text-align:center;">
         <h1 style="color:var(--success)">🎉 Success!</h1>
-        <p>Order Placed Successfully.</p>
+        <p>Your order is confirmed and will be shipped soon.</p>
         <div style="background:var(--bg); padding:20px; border-radius:15px; margin:20px 0;">
-            <p>ID: <b id="final-tid"></b></p>
+            <p>Order ID: <b id="final-tid"></b></p>
         </div>
-        <button class="btn btn-primary" onclick="showPage('home')">Return Home</button>
+        <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
     </div>
 </div>
 
@@ -142,15 +154,15 @@
 const sampleUsers = {"admin": "123"};
 let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
 
-// Fixed Image Pool with high-reliability links
+// High-reliability Image Pool
 const imgPool = [
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1526170315873-3a98bc88a853?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?auto=format&fit=crop&w=500&q=80",
-    "https://images.unsplash.com/photo-1583394838336-397f33838685?auto=format&fit=crop&w=500&q=80"
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80",
+    "https://images.unsplash.com/photo-1526170315873-3a98bc88a853?w=500&q=80",
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80",
+    "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=500&q=80",
+    "https://images.unsplash.com/photo-1583394838336-397f33838685?w=500&q=80"
 ];
 
 let products = [];
@@ -171,19 +183,19 @@ let isLoginMode = true;
 
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
-    document.getElementById("auth-title").innerText = isLoginMode ? "Login to Elite" : "Create Account";
+    document.getElementById("auth-title").innerText = isLoginMode ? "Login to Elite" : "Register Account";
 }
 
 function handleAuth() {
     const u = document.getElementById("auth-user").value;
     const p = document.getElementById("auth-pass").value;
-    if(!u || !p) return alert("Please enter details");
+    if(!u || !p) return alert("Please fill credentials");
 
     if(isLoginMode) {
         if(users[u] && users[u] === p) { login(u); } 
-        else alert("Invalid credentials. Use admin / 123");
+        else alert("Invalid user or password!");
     } else {
-        if(users[u]) return alert("Username taken");
+        if(users[u]) return alert("Username already exists");
         users[u] = p;
         localStorage.setItem("users", JSON.stringify(users));
         login(u);
@@ -242,16 +254,30 @@ function updateCart() {
     let list = document.getElementById("cart-items-list");
     let total = cart.reduce((acc, item) => acc + item.price, 0);
     list.innerHTML = cart.length ? cart.map(i => `
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px; padding-bottom:5px; border-bottom:1px solid #eee">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
             <span>${i.name}</span><b>₹${i.price}</b>
-        </div>`).join('') : "<p style='color:#888; text-align:center'>Empty Cart</p>";
+        </div>`).join('') : "<p style='text-align:center; color:#888'>Cart is empty</p>";
     document.getElementById("sum-total").innerText = "₹" + total;
 }
 
+function validateDetails() {
+    const name = document.getElementById("c-name").value;
+    const phone = document.getElementById("c-phone").value;
+    const addr = document.getElementById("c-addr").value;
+    if(!name || !phone || !addr) return alert("Please fill all mandatory fields (Name, Phone, Address)!");
+    showPage('payment');
+}
+
 function processOrder() {
-    if(cart.length === 0) return alert("Cart is empty!");
-    const tid = "TID-" + Date.now();
-    const order = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, count: cart.length };
+    const tid = "ELITE-" + Date.now();
+    const type = document.getElementById("c-type").value;
+    const order = { 
+        id: tid, 
+        date: new Date().toLocaleDateString(), 
+        total: document.getElementById("sum-total").innerText, 
+        count: cart.length,
+        addressType: type
+    };
 
     document.getElementById("loading").style.display = "flex";
     setTimeout(() => {
@@ -272,7 +298,7 @@ function renderHistory() {
     
     if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) {
         clearBtn.style.display = "none";
-        list.innerHTML = "<p style='text-align:center;'>No orders yet.</p>";
+        list.innerHTML = "<p style='text-align:center;'>No orders found.</p>";
         return;
     }
     
@@ -281,17 +307,17 @@ function renderHistory() {
         list.innerHTML += `
             <div class="history-item">
                 <div style="display:flex; justify-content:space-between">
-                    <b>ID: #${o.id}</b>
-                    <span class="status-badge">Processing</span>
+                    <b>Order #${o.id}</b>
+                    <span class="status-badge">${o.addressType} Delivery</span>
                 </div>
-                <p style="margin:5px 0">Items: ${o.count} | Amount: ${o.total}</p>
-                <small>${o.date}</small>
+                <p style="margin:5px 0">Qty: ${o.count} | Amount: ${o.total}</p>
+                <small>${o.date} - Out for Delivery</small>
             </div>`;
     });
 }
 
 function clearHistory() {
-    if(confirm("Permanently delete all order history?")) {
+    if(confirm("Wipe all order history?")) {
         allOrders[currentUser] = [];
         localStorage.setItem("orders", JSON.stringify(allOrders));
         renderHistory();
