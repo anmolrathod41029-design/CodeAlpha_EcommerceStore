@@ -2,10 +2,16 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CodeAlpha Store - FULL STACK PRO</title><style>
+<title>CodeAlpha Store - FIREBASE EDITION</title>
+<style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#f4f4f4;transition:0.3s;}
-.dark{background:#111;color:white;}
+
+/* Dark Mode */
+body.dark {background:#111; color:white;}
+body.dark .product, body.dark .section, body.dark .modal-content {background:#222; color:white; box-shadow: 0 0 10px rgba(255,255,255,0.1);}
+body.dark .sample {background: #333;}
+body.dark input, body.dark select {background: #444; color: white;}
 
 nav{
 background:#111;color:white;
@@ -14,10 +20,11 @@ align-items:center;
 padding:15px;
 position:sticky;top:0;z-index:1000;
 flex-wrap:wrap;
+gap: 10px;
 }
 
 nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-nav input{padding:8px;border-radius:8px;border:none;outline:none;}
+nav input, nav select {padding:8px;border-radius:8px;border:none;outline:none;}
 nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
 
 .hero{
@@ -27,21 +34,11 @@ text-align:center;
 padding:50px 20px;
 }
 
-.container{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
-justify-content:center;
-padding:25px;
-}
+.container{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:25px;}
 
 .product{
-background:white;
-width:260px;
-border-radius:15px;
-overflow:hidden;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-position:relative;
+background:white; width:260px; border-radius:15px; overflow:hidden;
+box-shadow:0 0 10px rgba(0,0,0,0.1); position:relative; transition: 0.3s;
 }
 
 .product img{width:100%;height:200px;object-fit:cover;background:#eaeaea;}
@@ -53,188 +50,420 @@ position:relative;
 .cart-btn{background:green;color:white;}
 .delete-btn{background:red;color:white;margin-top:5px;}
 
-.section{background:white;margin:20px;padding:20px;border-radius:15px;}
+.section{background:white;margin:20px;padding:20px;border-radius:15px; box-shadow:0 0 10px rgba(0,0,0,0.05);}
 
-.toast{position:fixed;bottom:20px;right:20px;background:black;color:white;padding:10px;border-radius:10px;display:none;}
+#cartItems { list-style: none; margin-bottom: 15px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd; }
+.cart-controls button { background: #ddd; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 0 5px;}
+.cart-controls button:hover { background: #ccc; }
 
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
+.toast{
+    position:fixed; bottom:-50px; left:50%; transform: translateX(-50%);
+    background:#222; color:white; padding:12px 24px; border-radius:30px;
+    font-weight: bold; font-size: 14px; z-index: 2000;
+    transition: bottom 0.4s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.toast.show { bottom: 20px; }
 
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center; z-index: 3000;}
 .modal-content{background:white;padding:20px;border-radius:10px;width:320px;text-align:center;position:relative;}
-
 .modal-content input{width:100%;padding:8px;margin:5px 0;}
-
 .close{position:absolute;right:10px;top:5px;cursor:pointer;font-size:18px;}
-
 .sample{margin-top:10px;padding:10px;background:#f2f2f2;border-radius:8px;font-size:13px;}
 
-</style></head>
-<body><nav>
-<h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
-<input id="search" placeholder="Search products" onkeyup="renderProducts()" />
-<button onclick="toggleMode()">🌙</button>
-<button onclick="openAuth()">Login/Register</button>
-<button onclick="openAdmin()">Admin</button>
-<span id="user"></span>
-<button>🛍 <span id="count">0</span></button>
+.checkout-btn { background: orange; padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; width: 100%;}
+.checkout-btn:hover { background: darkorange; color: white;}
+
+.order-card { background: #f9f9f9; padding: 10px; border-left: 4px solid green; margin-bottom: 10px; border-radius: 4px; }
+body.dark .order-card { background: #333; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+</head>
+<body>
+
+<nav>
+    <h1>🛒 CodeAlpha FULL STACK</h1>
+    <div class="right">
+        <select id="sortOption" onchange="renderProducts()">
+            <option value="">Sort: Default</option>
+            <option value="low">Price: Low to High</option>
+            <option value="high">Price: High to Low</option>
+        </select>
+        <input id="search" placeholder="Search products" onkeyup="renderProducts()" />
+        <button onclick="toggleMode()">🌙</button>
+        <button onclick="openAuth()">Login/Register</button>
+        <button onclick="openAdmin()" id="adminBtn" style="display:none;">Admin</button>
+        <span id="user"></span>
+        <button>🛍 <span id="count">0</span></button>
+    </div>
+</nav>
+
+<section class="hero">
+    <h2>Cloud Connected E-Commerce System</h2>
+    <p>Powered by Firebase Cloud Firestore</p>
+</section>
+
+<div class="container" id="productList">
+    <p style="text-align: center; width: 100%;">Loading products from database...</p>
 </div>
-</nav><section class="hero">
-<h2>Full Stack E-Commerce System</h2>
-<p>Firebase Ready • Razorpay Ready • Admin Dashboard</p>
-</section><div class="container" id="productList"></div><div class="section">
-<h2>Cart</h2>
-<ul id="cartItems"></ul>
-<p>Total: ₹<span id="total">0</span></p>
-<button onclick="checkout()">Checkout (Mock)</button>
-</div><div class="section">
-<h2>Orders</h2>
-<div id="orders"></div>
-</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><div class="modal" id="authModal">
-<div class="modal-content">
-<span class="close" onclick="closeAuth()">✖</span>
-<h3 id="authTitle">Login</h3>
-<input id="email" placeholder="Username" />
-<input id="pass" type="password" placeholder="Password" />
-<button onclick="login()">Submit</button>
-<p onclick="toggleAuth()" style="cursor:pointer;color:blue">Switch Login/Register</p><div class="sample">
-<b>Sample Login</b><br>
-Username: admin<br>
-Password: admin123
+
+<div class="section">
+    <h2>Your Cart</h2>
+    <ul id="cartItems"></ul>
+    <h3 style="text-align: right;">Total: ₹<span id="total">0</span></h3>
+    <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
 </div>
+
+<div class="section">
+    <h2>Order History</h2>
+    <div id="orders"><p>Loading orders...</p></div>
 </div>
-</div><div class="modal" id="adminModal">
-<div class="modal-content">
-<span class="close" onclick="closeAdmin()">✖</span>
-<h3>Admin Panel</h3>
-<input id="pname" placeholder="Product Name" />
-<input id="pprice" type="number" placeholder="Price" />
-<input id="pimg" placeholder="Image URL (Optional)" />
-<input id="pdesc" placeholder="Description" />
-<button onclick="addProduct()">Add Product</button>
+
+<footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack Pro</footer>
+
+<div class="toast" id="toast">Message goes here</div>
+
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAuth()">✖</span>
+        <h3 id="authTitle">Login</h3>
+        <input id="email" placeholder="Username" />
+        <input id="pass" type="password" placeholder="Password" />
+        <button class="btn cart-btn" style="width: 100%; margin-top: 10px;" onclick="login()">Submit</button>
+        <p onclick="toggleAuth()" style="cursor:pointer;color:blue; margin-top:10px;">Switch Login/Register</p>
+    </div>
 </div>
-</div><script>
 
-let products = JSON.parse(localStorage.getItem("products")) || [
-{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness smartwatch"},
-{name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
-];
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAdmin()">✖</span>
+        <h3>Admin Panel</h3>
+        <input id="pname" placeholder="Product Name" />
+        <input id="pprice" type="number" placeholder="Price" />
+        <input id="pimg" placeholder="Image URL (Optional)" />
+        <input id="pdesc" placeholder="Description" />
+        <button class="btn cart-btn" style="width: 100%; margin-top: 10px;" onclick="addProduct()">Add Product to Database</button>
+    </div>
+</div>
 
-// --- CAMERA ASSASSIN CODE ---
-// This forces your browser to forget the broken "Camera" product
-products = products.filter(p => p.name.toLowerCase() !== "camera");
-localStorage.setItem("products", JSON.stringify(products));
-// ----------------------------
+<script>
+// ==========================================
+// 1. FIREBASE CONFIGURATION (REPLACE THESE KEYS!)
+// ==========================================
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-let cart=[];
-let user=localStorage.getItem("user");
-let orders=JSON.parse(localStorage.getItem("orders"))||{};
-let isLogin=true;
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBTKLaMVmaOyDWio67A0tYHCSNfVVEevAM",
+  authDomain: "codeaplha-store.firebaseapp.com",
+  projectId: "codeaplha-store",
+  storageBucket: "codeaplha-store.firebasestorage.app",
+  messagingSenderId: "194884468742",
+  appId: "1:194884468742:web:9058c662aa3c1cb3564387",
+  measurementId: "G-ZH36DJ6X13"
+};
 
-renderProducts();updateUI();renderOrders();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
-function renderProducts(){
-    let box=document.getElementById("productList");
-    let s=document.getElementById("search")?.value?.toLowerCase()||"";
-    box.innerHTML="";
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-    products.filter(p => p.name && p.price > 0 && p.name.toLowerCase().includes(s)).forEach((p,i)=>{
-        // Check if image exists and isn't empty, otherwise use a placeholder
+// ==========================================
+// 2. GLOBAL VARIABLES
+// ==========================================
+let products = []; // Now fetched from the cloud!
+let cart = []; 
+let user = localStorage.getItem("user");
+let isLogin = true;
+let toastTimeout;
+
+// Initialize UI
+updateUI();
+fetchProductsFromDB();
+if(user) fetchOrdersFromDB();
+
+// ==========================================
+// 3. DATABASE FUNCTIONS (CLOUD SYNCHRONIZATION)
+// ==========================================
+
+// Fetch Products from Firestore Collection
+async function fetchProductsFromDB() {
+    try {
+        const snapshot = await db.collection('products').get();
+        products = snapshot.docs.map(doc => ({
+            id: doc.id, // Store the unique database ID to allow deleting later
+            ...doc.data()
+        }));
+        renderProducts();
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        document.getElementById("productList").innerHTML = "<p style='color:red'>Failed to connect to database. Did you add your Firebase keys?</p>";
+    }
+}
+
+// Add Product to Firestore Collection
+async function addProduct() {
+    let n = document.getElementById("pname").value.trim();
+    let p = document.getElementById("pprice").value;
+    let i = document.getElementById("pimg").value.trim();
+    let d = document.getElementById("pdesc").value.trim();
+
+    if(!n || !p || p <= 0) return showToast("❌ Enter a valid Name and Price!");
+    if(!i) i = "https://placehold.co/260x200?text=No+Image";
+
+    showToast("⏳ Saving to database...");
+    
+    try {
+        await db.collection('products').add({
+            name: n,
+            price: +p,
+            img: i,
+            desc: d
+        });
+        
+        // Clear Form
+        document.getElementById("pname").value = "";
+        document.getElementById("pprice").value = "";
+        document.getElementById("pimg").value = "";
+        document.getElementById("pdesc").value = "";
+        
+        closeAdmin();
+        showToast("✅ Product Added to Database!");
+        fetchProductsFromDB(); // Refresh list from cloud
+    } catch (error) {
+        showToast("❌ Error saving product.");
+    }
+}
+
+// Delete Product from Firestore
+async function deleteProduct(index) {
+    if(user !== "admin") return showToast("🚫 Only admin can delete products!");
+    
+    let productToDelete = products[index];
+    showToast("⏳ Deleting from database...");
+
+    try {
+        await db.collection('products').doc(productToDelete.id).delete();
+        showToast(`🗑️ Deleted ${productToDelete.name} from Cloud`);
+        fetchProductsFromDB(); // Refresh list from cloud
+    } catch (error) {
+        showToast("❌ Error deleting product.");
+    }
+}
+
+// Fetch User's Orders from Firestore
+async function fetchOrdersFromDB() {
+    if(!user) return;
+    
+    try {
+        const snapshot = await db.collection('orders').where("userId", "==", user).get();
+        let box = document.getElementById("orders");
+        box.innerHTML = "";
+        
+        if (snapshot.empty) {
+            box.innerHTML = "<p>No recent orders found.</p>";
+            return;
+        }
+
+        // Display orders
+        snapshot.docs.forEach(doc => {
+            let o = doc.data();
+            box.innerHTML += `
+            <div class="order-card">
+                <b>Order ID:</b> ${o.orderId} <br>
+                <b>Date:</b> ${o.date} <br>
+                <b style="color:green">Total: ₹${o.totalAmount}</b>
+            </div>`;
+        });
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+    }
+}
+
+// Process Checkout & Save Order to Firestore
+async function checkout() {
+    if(!user) return showToast("⚠️ Login required to checkout!");
+    if(!cart.length) return showToast("⚠️ Your cart is empty!");
+    
+    let orderId = "ORD" + Date.now();
+    let total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    
+    showToast("⏳ Processing Order...");
+
+    try {
+        // Save to 'orders' collection
+        await db.collection('orders').add({
+            orderId: orderId,
+            userId: user,
+            items: cart,
+            totalAmount: total,
+            date: new Date().toLocaleString()
+        });
+
+        cart = [];
+        updateCart();
+        fetchOrdersFromDB(); // Fetch updated list from cloud
+        showToast(`✅ Payment Successful! Order ID: ${orderId}`);
+    } catch (error) {
+        showToast("❌ Checkout failed.");
+    }
+}
+
+// User Authentication (Saving to Database)
+async function login() {
+    let e = document.getElementById("email").value.trim();
+    let p = document.getElementById("pass").value;
+    
+    if((e === "admin" && p === "admin123") || (e.length > 2)) {
+        user = e;
+        localStorage.setItem("user", e);
+        
+        // Save user record to database
+        try {
+            await db.collection('users').doc(user).set({
+                email: user,
+                role: (user === "admin") ? "admin" : "customer",
+                lastLogin: new Date().toLocaleString()
+            }, { merge: true });
+        } catch (error) {
+            console.error("Failed to sync user to database");
+        }
+
+        closeAuth();
+        updateUI();
+        fetchOrdersFromDB();
+        showToast(`👋 Welcome back, ${user}!`);
+    } else {
+        showToast("❌ Invalid Credentials. Try again.");
+    }
+}
+
+// ==========================================
+// 4. FRONT-END UI FUNCTIONS
+// ==========================================
+
+function renderProducts() {
+    let box = document.getElementById("productList");
+    let s = document.getElementById("search")?.value?.toLowerCase() || "";
+    let sortVal = document.getElementById("sortOption").value;
+    
+    if(products.length === 0) {
+        box.innerHTML = "<p>Store is empty or database not connected.</p>";
+        return;
+    }
+
+    box.innerHTML = "";
+
+    // Filter valid products based on search
+    let filteredProducts = products.map((p, index) => ({...p, originalIndex: index}))
+                                   .filter(p => p.name && p.price > 0 && p.name.toLowerCase().includes(s));
+    
+    // Sort logic
+    if(sortVal === "low") filteredProducts.sort((a,b) => a.price - b.price);
+    if(sortVal === "high") filteredProducts.sort((a,b) => b.price - a.price);
+
+    filteredProducts.forEach((p) => {
         let safeImg = (p.img && p.img.trim() !== "") ? p.img : "https://placehold.co/260x200?text=No+Image";
         
-        box.innerHTML+=`
+        box.innerHTML += `
         <div class='product'>
-        <img src='${safeImg}' onerror="this.src='https://placehold.co/260x200?text=Image+Error'"/>
-        <div class='product-content'>
-        <h3>${p.name}</h3>
-        <p class='desc'>${p.desc}</p>
-        <p class='price'>₹${p.price}</p>
-        <button class='btn cart-btn' onclick='add(${i})'>Add</button>
-        <button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>
-        </div></div>`;
+            <img src='${safeImg}' onerror="this.src='https://placehold.co/260x200?text=Image+Error'"/>
+            <div class='product-content'>
+                <h3>${p.name}</h3>
+                <p class='desc'>${p.desc}</p>
+                <p class='price'>₹${p.price}</p>
+                <button class='btn cart-btn' onclick='addToCart(${p.originalIndex})'>Add to Cart</button>
+                ${user === "admin" ? `<button class='btn delete-btn' onclick='deleteProduct(${p.originalIndex})'>Delete</button>` : ""}
+            </div>
+        </div>`;
     });
 }
 
-function add(i){if(!user)return alert("Login required");cart.push(products[i]);updateCart();}
-
-function deleteProduct(i){
-    if(user!="admin")return alert("Only admin can delete");
-    products.splice(i,1);
-    localStorage.setItem("products",JSON.stringify(products));
-    renderProducts();
-}
-
-function updateCart(){
-    document.getElementById("count").innerText=cart.length;
-    let t=0;
-    document.getElementById("cartItems").innerHTML="";
-    cart.forEach(c=>{t+=c.price;document.getElementById("cartItems").innerHTML+=`<li>${c.name} - ₹${c.price}</li>`;});
-    document.getElementById("total").innerText=t;
-}
-
-function checkout(){
-    if(!cart.length) return;
+function addToCart(index) {
+    if(!user) return showToast("⚠️ You must be logged in to shop!");
     
-    let id = "ORD" + Date.now();
-    let total = cart.reduce((a,b) => a + b.price, 0);
+    let product = products[index];
+    let existingItem = cart.find(item => item.name === product.name);
     
-    if(!orders[user]) orders[user] = [];
-    orders[user].push({id, total});
-    localStorage.setItem("orders", JSON.stringify(orders));
-    
-    cart = [];
-    updateCart();
-    renderOrders();
-    
-    alert("Order is placed and payment is successful!\nOrder ID: " + id);
-}
-
-function renderOrders(){
-    let box=document.getElementById("orders");box.innerHTML="";
-    if(!orders[user])return;
-    orders[user].forEach(o=>box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`);
-}
-
-function toggleMode(){document.body.classList.toggle("dark");}
-function openAuth(){document.getElementById("authModal").style.display="flex";}
-function closeAuth(){document.getElementById("authModal").style.display="none";}
-function openAdmin(){document.getElementById("adminModal").style.display="flex";}
-function closeAdmin(){document.getElementById("adminModal").style.display="none";}
-
-function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").innerText=isLogin?"Login":"Register";}
-
-function login(){
-    let e=document.getElementById("email").value;
-    let p=document.getElementById("pass").value;
-    if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();renderOrders();}
-    else alert("Invalid Credentials");
-}
-
-function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
-
-function addProduct(){
-    let n=document.getElementById("pname").value.trim();
-    let p=document.getElementById("pprice").value;
-    let i=document.getElementById("pimg").value.trim();
-    let d=document.getElementById("pdesc").value.trim();
-
-    if(!n || !p || p <= 0) {
-        alert("Please enter a valid Product Name and Price greater than 0.");
-        return;
+    if(existingItem) {
+        existingItem.qty++;
+    } else {
+        cart.push({...product, qty: 1});
     }
     
-    if(!i) i = "https://placehold.co/260x200?text=No+Image";
-
-    products.push({name:n,price:+p,img:i,desc:d});
-    localStorage.setItem("products",JSON.stringify(products));
-    renderProducts();
-    
-    document.getElementById("pname").value = "";
-    document.getElementById("pprice").value = "";
-    document.getElementById("pimg").value = "";
-    document.getElementById("pdesc").value = "";
-    
-    alert("Product Added Successfully");
-    closeAdmin();
+    updateCart();
+    showToast(`🛒 ${product.name} added to cart`);
 }
 
-</script></body>
-</html>
+function updateQty(cartIndex, delta) {
+    cart[cartIndex].qty += delta;
+    if(cart[cartIndex].qty <= 0) {
+        cart.splice(cartIndex, 1);
+    }
+    updateCart();
+}
+
+function updateCart() {
+    let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    document.getElementById("count").innerText = totalItems;
+    
+    let grandTotal = 0;
+    let cartHTML = "";
+    
+    cart.forEach((item, i) => {
+        let itemTotal = item.price * item.qty;
+        grandTotal += itemTotal;
+        cartHTML += `
+            <li class="cart-item">
+                <span><b>${item.name}</b> (₹${item.price})</span>
+                <div class="cart-controls">
+                    <button onclick="updateQty(${i}, -1)">-</button>
+                    <span>${item.qty}</span>
+                    <button onclick="updateQty(${i}, 1)">+</button>
+                    <span style="margin-left: 10px; color: green; font-weight: bold;">₹${itemTotal}</span>
+                </div>
+            </li>`;
+    });
+    
+    document.getElementById("cartItems").innerHTML = cartHTML || "<li><i>Cart is empty</i></li>";
+    document.getElementById("total").innerText = grandTotal;
+}
+
+function showToast(message) {
+    let toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => { toast.classList.remove("show"); }, 3000);
+}
+
+function toggleMode() {
+    document.body.classList.toggle("dark");
+    showToast(document.body.classList.contains("dark") ? "🌙 Dark Mode Enabled" : "☀️ Light Mode Enabled");
+}
+
+function updateUI() {
+    document.getElementById("user").innerText = user ? "👤 " + user : "";
+    document.getElementById("adminBtn").style.display = (user === "admin") ? "block" : "none";
+    renderProducts(); 
+}
+
+function openAuth(){ document.getElementById("authModal").style.display="flex"; }
+function closeAuth(){ document.getElementById("authModal").style.display="none"; }
+function openAdmin(){ document.getElementById("adminModal").style.display="flex"; }
+function closeAdmin(){ document.getElementById("adminModal").style.display="none"; }
+function toggleAuth(){ isLogin = !isLogin; document.getElementById("authTitle").innerText = isLogin ? "Login" : "Register"; }
+
+</script></body></html>
