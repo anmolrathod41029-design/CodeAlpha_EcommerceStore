@@ -37,6 +37,7 @@
 
         .btn { padding: 12px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         
         .box { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 550px; margin: 0 auto; }
@@ -57,9 +58,9 @@
 <nav>
     <div class="logo" onclick="showPage('home')">EliteCommerce</div>
     <div class="nav-right">
-        <input type="text" id="search" placeholder="Search 528 items..." onkeyup="renderProducts()">
+        <input type="text" id="search" placeholder="Search tech collection..." onkeyup="renderProducts()">
         <button class="btn" style="background:none; color:white;" onclick="toggleTheme()">🌓</button>
-        <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 <span id="cart-count">0</span></button>
+        <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 Cart: <span id="cart-count">0</span></button>
         <button class="btn btn-outline" style="border-color:white; color:white;" onclick="checkAuth('history')">📜 Orders</button>
         <span id="user-display" style="font-weight:bold; color:var(--primary); cursor:pointer;" onclick="logout()"></span>
     </div>
@@ -75,8 +76,7 @@
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">Submit</button>
         <div class="sample-login-info">
             <strong>Sample Credentials:</strong><br>
-            User: <code>admin</code><br>
-            Pass: <code>123</code>
+            User: <code>admin</code> | Pass: <code>123</code>
         </div>
         <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Don't have an account? Register</p>
     </div>
@@ -90,9 +90,11 @@
 <div id="cart" class="page">
     <div class="box">
         <h2>Order Summary</h2>
-        <div id="cart-items-list" style="margin: 20px 0;"></div>
+        <div id="cart-items-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;"></div>
         <hr><br>
-        <div style="display:flex; justify-content:space-between"><span>Grand Total (Inc. Tax)</span><b id="sum-total">₹0</b></div>
+        <div style="display:flex; justify-content:space-between"><span>Subtotal</span><span id="sub-total">₹0</span></div>
+        <div style="display:flex; justify-content:space-between; color: #888;"><span>Tax (GST 18%)</span><span id="tax-total">₹0</span></div>
+        <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.2rem; margin-top: 10px;"><span>Grand Total</span><b id="sum-total">₹0</b></div>
         <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Next: Shipping Details</button>
     </div>
 </div>
@@ -109,10 +111,10 @@
 <div id="payment" class="page">
     <div class="box">
         <h2>Secure Payment</h2>
-        <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0;">
+        <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
             <input type="radio" name="pm" value="UPI" checked> UPI / NetBanking
         </label>
-        <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0;">
+        <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
             <input type="radio" name="pm" value="COD"> Cash on Delivery
         </label>
         <button class="btn btn-primary" style="width: 100%;" onclick="processOrder()">Complete Purchase</button>
@@ -136,11 +138,9 @@
 </div>
 
 <script>
-// Logic for Hardcoded Sample Login
 const sampleUsers = {"admin": "123"};
 let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
 
-// Image Pool for Randomization
 const imgPool = [
     "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",
     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
@@ -162,7 +162,6 @@ for(let i=0; i<528; i++) {
     });
 }
 
-// Fisher-Yates Shuffle for truly random sorting on load
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -188,7 +187,7 @@ function handleAuth() {
 
     if(isLoginMode) {
         if(users[u] && users[u] === p) { login(u); } 
-        else alert("Invalid credentials. Try admin / 123");
+        else alert("Invalid credentials. Use admin / 123");
     } else {
         if(users[u]) return alert("Username taken");
         users[u] = p;
@@ -212,14 +211,19 @@ function renderProducts() {
     const grid = document.getElementById("product-grid");
     const q = document.getElementById("search").value.toLowerCase();
     grid.innerHTML = "";
+    
     products.filter(p => p.name.toLowerCase().includes(q)).slice(0, 20).forEach(p => {
+        const inCart = cart.some(c => c.id === p.id);
         grid.innerHTML += `
             <div class="card">
                 <img src="${p.img}">
                 <div class="card-body">
                     <h3>${p.name}</h3>
                     <div class="price">₹${p.price}</div>
-                    <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
+                    <div style="display:flex; gap:5px; justify-content:center;">
+                        <button class="btn btn-primary" onclick="addToCart(${p.id})">${inCart ? 'Already Added' : 'Add to Cart'}</button>
+                        ${inCart ? `<button class="btn btn-danger" onclick="removeFromCart(${p.id})">Remove</button>` : ''}
+                    </div>
                 </div>
             </div>`;
     });
@@ -228,27 +232,66 @@ function renderProducts() {
 function addToCart(id) {
     if(!currentUser) return showPage('auth');
     const p = products.find(prod => prod.id === id);
-    if(!cart.some(c => c.id === id)) cart.push(p);
+    if(!cart.some(c => c.id === id)) {
+        cart.push(p);
+        updateCart();
+        renderProducts();
+    }
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(c => c.id !== id);
     updateCart();
+    renderProducts();
 }
 
 function updateCart() {
+    // Update Badge
     document.getElementById("cart-count").innerText = cart.length;
+    
+    // Update Summary List
     let list = document.getElementById("cart-items-list");
-    let total = cart.reduce((acc, item) => acc + item.price, 0);
-    list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('');
-    document.getElementById("sum-total").innerText = "₹" + Math.round(total * 1.18);
+    if(cart.length === 0) {
+        list.innerHTML = "<p style='text-align:center; color:#888;'>No items in cart.</p>";
+    } else {
+        list.innerHTML = cart.map(i => `
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <span>${i.name}</span>
+                <div>
+                    <b>₹${i.price}</b>
+                    <span onclick="removeFromCart(${i.id})" style="color:red; cursor:pointer; margin-left:10px; font-size: 0.8rem;">Remove</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Calculations
+    let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+    let tax = Math.round(subtotal * 0.18);
+    document.getElementById("sub-total").innerText = "₹" + subtotal;
+    document.getElementById("tax-total").innerText = "₹" + tax;
+    document.getElementById("sum-total").innerText = "₹" + (subtotal + tax);
 }
 
 function processOrder() {
+    if(cart.length === 0) return alert("Your cart is empty!");
     const tid = "TID-" + Date.now();
-    const orderData = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, items: cart.length + " Items", status: "In Transit" };
+    const orderData = { 
+        id: tid, 
+        date: new Date().toLocaleDateString(), 
+        total: document.getElementById("sum-total").innerText, 
+        itemsCount: cart.length, 
+        status: "Dispatched" 
+    };
+
     document.getElementById("loading").style.display = "flex";
     setTimeout(() => {
         if(!allOrders[currentUser]) allOrders[currentUser] = [];
         allOrders[currentUser].push(orderData);
         localStorage.setItem("orders", JSON.stringify(allOrders));
-        cart = []; updateCart();
+        
+        cart = []; 
+        updateCart();
         document.getElementById("final-tid").innerText = tid;
         document.getElementById("loading").style.display = "none";
         showPage('success');
@@ -258,9 +301,19 @@ function processOrder() {
 function renderHistory() {
     const list = document.getElementById("order-history-list");
     list.innerHTML = "";
-    if(!currentUser || !allOrders[currentUser]) return list.innerHTML = "<p>No orders yet.</p>";
+    if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) {
+        return list.innerHTML = "<p style='text-align:center;'>You haven't placed any orders yet.</p>";
+    }
     allOrders[currentUser].slice().reverse().forEach(o => {
-        list.innerHTML += `<div class="history-item"><b>${o.id}</b> - ${o.total} <span class="status-badge">${o.status}</span><br><small>${o.date}</small></div>`;
+        list.innerHTML += `
+            <div class="history-item">
+                <div style="display:flex; justify-content:space-between">
+                    <b>Order #${o.id}</b>
+                    <span class="status-badge">${o.status}</span>
+                </div>
+                <p style="margin: 5px 0; color: #666;">Total Items: ${o.itemsCount} | Amount: ${o.total}</p>
+                <small>${o.date}</small>
+            </div>`;
     });
 }
 
@@ -268,13 +321,18 @@ function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
     document.getElementById(id).classList.add('active-page');
     if(id === 'history') renderHistory();
+    if(id === 'home') renderProducts();
+    window.scrollTo(0, 0);
 }
 
 function toggleTheme() { document.body.classList.toggle("dark-mode"); }
 
 // Init
-if(currentUser) document.getElementById("user-display").innerText = `👤 ${currentUser}`;
+if(currentUser) {
+    document.getElementById("user-display").innerText = `👤 ${currentUser}`;
+}
 renderProducts();
+updateCart();
 </script>
 </body>
 </html>
