@@ -3,60 +3,139 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CodeAlpha Store - Final Pro</title>
+<title>CodeAlpha Store - Final Clean Version</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
-body{background:#f4f4f4;transition:0.3s;}
-.dark{background:#111;color:white;}
 
+body{
+background:#f4f4f4;
+transition:0.3s;
+}
+
+.dark{
+background:#111;
+color:white;
+}
+
+/* NAV */
 nav{
-background:#111;color:white;
-display:flex;justify-content:space-between;
+background:#111;
+color:white;
+display:flex;
+justify-content:space-between;
 align-items:center;
 padding:15px;
-position:sticky;top:0;
+position:sticky;
+top:0;
+z-index:1000;
 flex-wrap:wrap;
 }
 
-nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-nav input{padding:8px;border:none;border-radius:8px;}
-nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
+nav .right{
+display:flex;
+gap:10px;
+align-items:center;
+flex-wrap:wrap;
+}
 
+nav input{
+padding:8px;
+border:none;
+border-radius:8px;
+outline:none;
+}
+
+nav button{
+background:orange;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+/* HERO */
 .hero{
 background:linear-gradient(to right,#111,#444);
-color:white;text-align:center;
+color:white;
+text-align:center;
 padding:50px 20px;
 }
 
+/* ✅ FIXED GRID (NO OVERLAP) */
 .container{
-display:flex;
-flex-wrap:wrap;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 gap:20px;
-justify-content:center;
 padding:25px;
+align-items:stretch;
 }
 
+/* PRODUCT CARD */
 .product{
 background:white;
-width:260px;
 border-radius:15px;
 overflow:hidden;
 box-shadow:0 0 10px rgba(0,0,0,0.2);
-position:relative;
+display:flex;
+flex-direction:column;
 }
 
-.product img{width:100%;height:200px;object-fit:cover;}
-.product-content{text-align:center;padding:12px;}
-.price{color:green;font-weight:bold;}
-.desc{font-size:13px;color:#555;margin:6px 0;}
+.product img{
+width:100%;
+height:180px;
+object-fit:cover;
+display:block;
+}
 
-.btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;margin:3px;}
-.cart-btn{background:green;color:white;}
-.del-btn{background:red;color:white;}
+.product-content{
+text-align:center;
+padding:12px;
+flex:1;
+}
 
-.section{background:white;margin:20px;padding:20px;border-radius:15px;}
+.price{
+color:green;
+font-weight:bold;
+font-size:18px;
+}
 
+.desc{
+font-size:13px;
+color:#555;
+margin:6px 0;
+}
+
+/* BUTTONS */
+.btn{
+padding:8px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+margin-top:5px;
+}
+
+.cart-btn{
+background:green;
+color:white;
+}
+
+.del-btn{
+background:red;
+color:white;
+}
+
+/* SECTIONS */
+.section{
+background:white;
+margin:20px;
+padding:20px;
+border-radius:15px;
+}
+
+/* MODAL */
 .modal{
 display:none;
 position:fixed;
@@ -71,19 +150,25 @@ background:white;
 padding:20px;
 border-radius:10px;
 width:320px;
-position:relative;
 text-align:center;
+position:relative;
 }
 
 .close{
 position:absolute;
-top:5px;right:10px;
+top:5px;
+right:10px;
 cursor:pointer;
 font-size:18px;
 }
 
-.modal-content input{width:100%;padding:8px;margin:5px 0;}
+.modal-content input{
+width:100%;
+padding:8px;
+margin:5px 0;
+}
 
+/* SAMPLE BOX */
 .sample{
 margin-top:10px;
 background:#f2f2f2;
@@ -94,8 +179,10 @@ font-size:13px;
 
 </style>
 </head>
+
 <body>
 
+<!-- NAV -->
 <nav>
 <h2>🛒 CodeAlpha Store</h2>
 
@@ -109,13 +196,16 @@ font-size:13px;
 </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
 <h1>Final E-Commerce Project</h1>
-<p>Full Stack Simulation System</p>
+<p>Clean UI • No Overlap • Full Working System</p>
 </section>
 
+<!-- PRODUCTS -->
 <div class="container" id="products"></div>
 
+<!-- CART -->
 <div class="section">
 <h2>Cart</h2>
 <ul id="cart"></ul>
@@ -128,6 +218,7 @@ font-size:13px;
 <div class="modal-content">
 <span class="close" onclick="closeAuth()">✖</span>
 <h3>Login</h3>
+
 <input id="u" placeholder="Username">
 <input id="p" type="password" placeholder="Password">
 <button onclick="login()">Submit</button>
@@ -137,6 +228,7 @@ font-size:13px;
 Username: admin<br>
 Password: admin123
 </div>
+
 </div>
 </div>
 
@@ -145,10 +237,12 @@ Password: admin123
 <div class="modal-content">
 <span class="close" onclick="closeAdmin()">✖</span>
 <h3>Admin Panel</h3>
+
 <input id="n" placeholder="Name">
 <input id="pr" placeholder="Price">
 <input id="img" placeholder="Image URL">
 <input id="d" placeholder="Description">
+
 <button onclick="add()">Add Product</button>
 </div>
 </div>
@@ -156,7 +250,7 @@ Password: admin123
 <script>
 
 let products = JSON.parse(localStorage.getItem("products")) || [
-{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking & heart rate monitor"},
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking smartwatch"},
 {name:"Headphones",price:1499,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"},
 {name:"Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Comfortable running shoes"},
 {name:"Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",desc:"High performance smartphone"},
@@ -177,6 +271,7 @@ let cart=[];
 let user=localStorage.getItem("user");
 
 renderProducts();
+updateUI();
 
 function renderProducts(){
 let box=document.getElementById("products");
@@ -191,6 +286,7 @@ box.innerHTML+=`
 <h3>${p.name}</h3>
 <p class="desc">${p.desc}</p>
 <p class="price">₹${p.price}</p>
+
 <button class="btn cart-btn" onclick="add(${i})">Add</button>
 <button class="btn del-btn" onclick="del(${i})">Delete</button>
 </div>
@@ -205,7 +301,7 @@ update();
 }
 
 function del(i){
-if(user!=="admin")return alert("Only admin");
+if(user!=="admin")return alert("Only admin can delete");
 products.splice(i,1);
 localStorage.setItem("products",JSON.stringify(products));
 renderProducts();
@@ -213,12 +309,15 @@ renderProducts();
 
 function update(){
 document.getElementById("count").innerText=cart.length;
+
 let t=0;
 document.getElementById("cart").innerHTML="";
+
 cart.forEach(c=>{
 t+=c.price;
 document.getElementById("cart").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
 });
+
 document.getElementById("total").innerText=t;
 }
 
@@ -228,26 +327,36 @@ cart=[];
 update();
 }
 
-function toggle(){document.body.classList.toggle("dark");}
+function toggle(){
+document.body.classList.toggle("dark");
+}
 
+/* AUTH */
 function openAuth(){document.getElementById("auth").style.display="flex";}
 function closeAuth(){document.getElementById("auth").style.display="none";}
 
+/* ADMIN */
 function openAdmin(){document.getElementById("admin").style.display="flex";}
 function closeAdmin(){document.getElementById("admin").style.display="none";}
 
+/* LOGIN */
 function login(){
 let u=document.getElementById("u").value;
 let p=document.getElementById("p").value;
 
-if(u==="admin" && p==="admin123" || (u && p)){
+if((u==="admin" && p==="admin123") || (u && p)){
 user=u;
 localStorage.setItem("user",u);
 closeAuth();
-document.getElementById("user").innerText="👤 "+u;
-}else alert("Invalid");
+updateUI();
+}else alert("Invalid login");
 }
 
+function updateUI(){
+document.getElementById("user").innerText=user?"👤 "+user:"";
+}
+
+/* ADD PRODUCT */
 function add(){
 let n=document.getElementById("n").value;
 let pr=document.getElementById("pr").value;
@@ -257,9 +366,10 @@ let d=document.getElementById("d").value;
 products.push({name:n,price:+pr,img,desc:d});
 localStorage.setItem("products",JSON.stringify(products));
 renderProducts();
-alert("Added");
+alert("Product Added");
 }
 
 </script>
+
 </body>
 </html>
