@@ -118,6 +118,12 @@ let products = JSON.parse(localStorage.getItem("products")) || [
 {name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
 ];
 
+// --- CAMERA ASSASSIN CODE ---
+// This forces your browser to forget the broken "Camera" product
+products = products.filter(p => p.name.toLowerCase() !== "camera");
+localStorage.setItem("products", JSON.stringify(products));
+// ----------------------------
+
 let cart=[];
 let user=localStorage.getItem("user");
 let orders=JSON.parse(localStorage.getItem("orders"))||{};
@@ -215,7 +221,6 @@ function addProduct(){
         return;
     }
     
-    // If Admin leaves image blank, apply placeholder immediately before saving
     if(!i) i = "https://placehold.co/260x200?text=No+Image";
 
     products.push({name:n,price:+p,img:i,desc:d});
