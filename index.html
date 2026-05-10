@@ -3,299 +3,266 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CodeAlpha - Premium Store</title>
+    <title>CodeAlpha | Premium Mega Hub</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f8f9fa; color: #333; transition: 0.3s; }
-        .dark { background: #121212; color: #e0e0e0; }
-        .dark .section, .dark .product, .dark .modal-content { background: #1e1e1e; color: white; border: 1px solid #333; }
+        :root { --primary: #28a745; --dark: #121212; --light: #f4f7f6; --accent: #ff9900; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         
-        nav {
-            background: #000; color: white;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 5%; position: sticky; top: 0; z-index: 1000;
+        body { background: var(--light); color: #333; overflow-x: hidden; }
+        
+        /* Navigation Bar */
+        nav { 
+            background: #000; color: white; padding: 15px 5%; 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary); cursor: pointer; letter-spacing: -1px; }
         .nav-right { display: flex; gap: 15px; align-items: center; }
-        nav input { padding: 8px 15px; border-radius: 20px; border: none; width: 220px; }
-        
-        .btn { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .cart-btn { background: #28a745; color: white; }
-        .remove-btn { background: #dc3545; color: white; }
-        .auth-btn { background: #ff9900; color: white; }
+        nav input { padding: 10px 20px; border-radius: 25px; border: none; width: 350px; outline: none; font-size: 0.9rem; }
 
-        .hero {
-            background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
-            color: white; text-align: center; padding: 50px 20px;
-        }
+        /* Page Layouts */
+        .page { display: none; padding: 40px 5%; animation: fadeIn 0.4s ease; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 30px 5%; }
-        
-        .product {
-            background: white; width: 260px; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative;
-        }
-        .product img { width: 100%; height: 200px; object-fit: cover; transition: 0.5s; }
-        .product:hover img { transform: scale(1.05); }
-        .product-content { padding: 15px; text-align: center; }
-        .price { color: #28a745; font-size: 1.2rem; font-weight: 800; margin: 8px 0; }
+        /* Product Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; margin-top: 30px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.06); border: 1px solid #eee; transition: 0.3s; position: relative; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-body { padding: 20px; text-align: center; }
+        .price { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin: 8px 0; }
+        .desc { font-size: 0.85rem; color: #777; margin-bottom: 15px; height: 35px; overflow: hidden; }
 
-        .section { background: white; margin: 20px 5%; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        /* Professional Buttons */
+        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; font-size: 0.95rem; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-add:hover { background: #218838; }
+        .btn-remove { background: #ff4444; color: white; margin-top: 5px; font-size: 0.8rem; padding: 6px; }
+        .btn-checkout { background: var(--accent); color: white; font-size: 1.1rem; }
 
-        /* Order Tracking Stepper */
-        .stepper { display: flex; justify-content: space-between; margin-top: 20px; }
-        .step { flex: 1; text-align: center; position: relative; font-size: 12px; color: #bbb; }
-        .step.active { color: #28a745; font-weight: bold; }
-        .step::before { content: '●'; display: block; font-size: 20px; margin-bottom: 5px; }
+        /* Checkout Form & Containers */
+        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        h2 { margin-bottom: 20px; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline-color: var(--primary); }
 
-        /* Payment Overlay */
-        #payOverlay {
-            display: none; position: fixed; inset: 0; background: white;
-            z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #28a745; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        /* Payment UI */
+        .pay-option { border: 2px solid #eee; padding: 20px; border-radius: 12px; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .pay-option:hover { border-color: var(--primary); background: #f0fff4; }
+        .pay-option input { width: auto; margin: 0; }
+
+        /* Tracking & Success */
+        .success-box { text-align: center; max-width: 600px; margin: 0 auto; }
+        .track-card { background: #000; color: white; padding: 30px; border-radius: 20px; margin: 25px 0; }
+        .track-id { color: var(--accent); font-family: 'Courier New', monospace; font-size: 1.5rem; display: block; margin-top: 10px; }
+
+        /* Loading Overlay */
+        #loading-overlay { display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 350px; text-align: center; }
-        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <h2 onclick="location.reload()" style="cursor:pointer">🛒 CodeAlpha</h2>
+    <div class="logo" onclick="switchPage('home-page')">CODEALPHA</div>
     <div class="nav-right">
-        <input id="search" placeholder="Search brands..." onkeyup="renderProducts()" />
-        <button class="btn" onclick="document.body.classList.toggle('dark')">🌓</button>
-        <span id="userName" style="color:#ff9900; font-weight:bold;"></span>
-        <button id="authBtn" class="btn auth-btn" onclick="openModal('authModal')">Login</button>
-        <button id="logoutBtn" class="btn remove-btn" onclick="logout()" style="display:none">Logout</button>
-        <button id="adminBtn" class="btn" onclick="openModal('adminModal')" style="display:none; background:#555; color:white;">Admin</button>
-        <button class="btn" style="background:#444; color:white;">Cart (<span id="cartCount">0</span>)</button>
+        <input type="text" id="search-bar" placeholder="Search 528 items..." onkeyup="renderProducts()">
+        <button class="btn btn-add" style="width: auto; padding: 10px 20px;" onclick="switchPage('cart-page')">🛒 Cart: <span id="cart-count">0</span></button>
     </div>
 </nav>
 
-<div id="payOverlay">
+<div id="loading-overlay">
     <div class="spinner"></div>
-    <h2 style="margin-top:20px;">Securing your transaction...</h2>
-    <p>Connecting to bank servers.</p>
+    <h2 style="margin-top:20px; color:#333">Processing Transaction...</h2>
+    <p>Ensuring end-to-end encryption</p>
 </div>
 
-<section class="hero">
-    <h1>Exclusive Digital Store</h1>
-    <p>Premium Products • Instant Checkout • Real-time Tracking</p>
-</section>
+<div id="home-page" class="page active-page">
+    <h1 style="text-align: center; margin-bottom: 10px;">The Mega Tech Collection</h1>
+    <p style="text-align: center; color: #888;">Browse 528+ Premium Handpicked Products</p>
+    <div class="grid" id="product-container"></div>
+</div>
 
-<div class="container" id="productList"></div>
-
-<div class="section">
-    <h2>Shopping Cart</h2>
-    <div id="cartItems" style="margin-top:15px;"></div>
-    <div style="text-align:right; border-top:2px solid #eee; padding-top:15px;">
-        <h3>Total: ₹<span id="totalPrice">0</span></h3>
-        <button class="btn cart-btn" style="width:200px; margin-top:10px;" onclick="startPayment()">Place Order</button>
+<div id="cart-page" class="page">
+    <div class="form-container">
+        <h2>Your Shopping Cart</h2>
+        <div id="cart-list" style="margin: 20px 0;"></div>
+        <div style="text-align: right; border-top: 2px solid #f4f4f4; padding-top: 15px;">
+            <h3>Total Amount: ₹<span id="cart-total">0</span></h3>
+            <button class="btn btn-checkout" style="margin-top: 20px;" onclick="switchPage('details-page')">Continue to Delivery Details →</button>
+        </div>
     </div>
 </div>
 
-<div class="section">
-    <h2>Order History & Tracking</h2>
-    <div id="orderHistory"></div>
-</div>
-
-<div class="modal" id="authModal">
-    <div class="modal-content">
-        <h3>Welcome Back</h3>
-        <input id="userInp" placeholder="Username" />
-        <input type="password" placeholder="Password" />
-        <button class="btn cart-btn" style="width:100%" onclick="login()">Sign In</button>
-        <button class="btn" style="width:100%; margin-top:10px;" onclick="closeModal('authModal')">Cancel</button>
+<div id="details-page" class="page">
+    <div class="form-container">
+        <h2>Delivery Information</h2>
+        <p style="color:#666; margin-bottom: 20px;">Provide accurate details for faster shipping.</p>
+        <input type="text" id="c-name" placeholder="Full Name">
+        <input type="text" id="c-phone" placeholder="Contact Number (+91)">
+        <input type="email" id="c-email" placeholder="Email Address">
+        <textarea id="c-address" placeholder="Complete Home/Office Address" rows="4"></textarea>
+        <button class="btn btn-checkout" onclick="validateDetails()">Proceed to Secure Payment</button>
     </div>
 </div>
 
-<div class="modal" id="adminModal">
-    <div class="modal-content">
-        <h3>Add Product</h3>
-        <input id="admName" placeholder="Name" />
-        <input id="admPrice" type="number" placeholder="Price" />
-        <input id="admImg" placeholder="Image URL" />
-        <input id="admDesc" placeholder="Description" />
-        <button class="btn cart-btn" style="width:100%" onclick="adminAdd()">Publish</button>
-        <button class="btn" style="width:100%; margin-top:10px;" onclick="closeModal('adminModal')">Close</button>
+<div id="payment-page" class="page">
+    <div class="form-container">
+        <h2>Secure Checkout</h2>
+        <p style="margin-bottom: 25px;">Choose your preferred payment method:</p>
+        
+        <label class="pay-option">
+            <input type="radio" name="pay-method" value="UPI">
+            <div>
+                <strong>UPI Payment</strong>
+                <div style="font-size: 0.8rem; color: #888;">PhonePe, GooglePay, Paytm</div>
+            </div>
+        </label>
+
+        <label class="pay-option">
+            <input type="radio" name="pay-method" value="COD">
+            <div>
+                <strong>Cash on Delivery (COD)</strong>
+                <div style="font-size: 0.8rem; color: #888;">Pay at your doorstep</div>
+            </div>
+        </label>
+
+        <button class="btn btn-add" style="font-size: 1.2rem; padding: 15px;" onclick="finalizeOrder()">Place Order Now</button>
+    </div>
+</div>
+
+<div id="success-page" class="page">
+    <div class="success-box">
+        <h1 style="color: var(--primary); font-size: 2.5rem;">Order Placed! 🎉</h1>
+        <p id="user-msg" style="margin-top: 10px; font-size: 1.1rem;"></p>
+        
+        <div class="track-card">
+            <p>Your Real-time Tracking ID:</p>
+            <strong class="track-id" id="display-track-id"></strong>
+            <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.7;">Estimated Delivery: Within 3-5 Business Days</p>
+        </div>
+
+        <p>A confirmation email with the invoice has been sent to your registered address.</p>
+        <button class="btn btn-checkout" style="width: 250px; margin-top: 30px;" onclick="location.reload()">Back to Store</button>
     </div>
 </div>
 
 <script>
-// INITIAL DATA
-let products = JSON.parse(localStorage.getItem("prods")) || [
-    {name:"Watch", price:999, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500", desc:"Classic analog watch"},
-    {name:"Perfume", price:899, img:"https://images.unsplash.com/photo-1541643600914-78b084683601?w=500", desc:"Parisian fragrance"},
-    {name:"Sunglasses", price:499, img:"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500", desc:"UV protection"},
-    {name:"Smart Band", price:1299, img:"https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500", desc:"Health tracker"}
+// 1. DATA ENGINE: Generate 528 items
+const categories = [
+    { name: "Pro Smartphone", price: 45000, img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500", desc: "Edge-to-edge display & 5G" },
+    { name: "Elite Headphones", price: 8999, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500", desc: "Studio quality noise cancelling" },
+    { name: "Titan Laptop", price: 78000, img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500", desc: "High performance for creators" },
+    { name: "FitBand Ultra", price: 2499, img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500", desc: "Heart rate & sleep tracking" },
+    { name: "Vibe Speaker", price: 1500, img: "https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=500", desc: "Deep bass portable audio" },
+    { name: "Vision Cam", price: 32000, img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500", desc: "4K cinematic video capture" },
+    { name: "Gamer Mouse", price: 1200, img: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500", desc: "Ultra-fast response sensor" },
+    { name: "Smart Lamp", price: 2100, img: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500", desc: "Voice controlled RGB lighting" }
 ];
 
-let cart = [];
-let user = localStorage.getItem("activeUser");
-let orders = JSON.parse(localStorage.getItem("allOrders")) || {};
-
-// CORE FUNCTIONS
-function renderProducts() {
-    const box = document.getElementById("productList");
-    const search = document.getElementById("search").value.toLowerCase();
-    box.innerHTML = "";
-
-    products.forEach((p, i) => {
-        // FILTER: Remove items with no valid image or "No Image" text
-        const isInvalid = !p.img || p.img.includes("No+Image") || p.img === "";
-        
-        if (!isInvalid && p.name.toLowerCase().includes(search)) {
-            const inCart = cart.some(item => item.name === p.name);
-            box.innerHTML += `
-                <div class="product">
-                    <img src="${p.img}">
-                    <div class="product-content">
-                        <h3>${p.name}</h3>
-                        <p style="font-size:12px; color:#777">${p.desc}</p>
-                        <p class="price">₹${p.price}</p>
-                        <div style="display:flex; gap:5px;">
-                            <button class="btn cart-btn" style="flex:3" onclick="addToCart(${i})">Add to Cart</button>
-                            ${inCart ? `<button class="btn remove-btn" style="flex:1" onclick="removeFromCart('${p.name}')">✖</button>` : ''}
-                        </div>
-                        ${user === 'admin' ? `<button class="btn" style="width:100%; margin-top:5px; background:#333; color:white" onclick="adminDel(${i})">Delete</button>` : ''}
-                    </div>
-                </div>`;
-        }
+let allProducts = [];
+for (let i = 0; i < 528; i++) {
+    let cat = categories[i % categories.length];
+    allProducts.push({
+        id: i,
+        name: `${cat.name} V${i + 1}`,
+        price: cat.price + (i * 5),
+        img: cat.img,
+        desc: cat.desc
     });
 }
 
-function addToCart(i) {
-    if(!user) return openModal('authModal');
-    cart.push(products[i]);
-    updateCartUI();
+let cart = [];
+
+// 2. RENDER ENGINE
+function renderProducts() {
+    const grid = document.getElementById("product-container");
+    const search = document.getElementById("search-bar").value.toLowerCase();
+    grid.innerHTML = "";
+
+    // Optimized filtering: only show first 24 to maintain speed
+    const filtered = allProducts.filter(p => p.name.toLowerCase().includes(search)).slice(0, 24);
+
+    filtered.forEach(p => {
+        const isInCart = cart.some(item => item.id === p.id);
+        grid.innerHTML += `
+            <div class="card">
+                <img src="${p.img}">
+                <div class="card-body">
+                    <h3>${p.name}</h3>
+                    <p class="desc">${p.desc}</p>
+                    <div class="price">₹${p.price}</div>
+                    <button class="btn btn-add" onclick="addToCart(${p.id})">Add to Cart</button>
+                    ${isInCart ? `<button class="btn btn-remove" onclick="removeFromCart(${p.id})">Remove from Cart</button>` : ''}
+                </div>
+            </div>`;
+    });
+}
+
+// 3. CART LOGIC
+function addToCart(id) {
+    cart.push(allProducts[id]);
+    updateUI();
+}
+
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById("cart-count").innerText = cart.length;
+    const list = document.getElementById("cart-list");
+    let total = 0;
+    list.innerHTML = cart.length ? "" : "<p>No items in cart.</p>";
+    
+    cart.forEach(item => {
+        total += item.price;
+        list.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>${item.name}</span><b>₹${item.price}</b>
+        </div>`;
+    });
+    document.getElementById("cart-total").innerText = total;
     renderProducts();
 }
 
-function removeFromCart(name) {
-    const idx = cart.findIndex(item => item.name === name);
-    if(idx > -1) {
-        cart.splice(idx, 1);
-        updateCartUI();
-        renderProducts();
-    }
+// 4. NAVIGATION & VALIDATION
+function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+    document.getElementById(pageId).classList.add('active-page');
+    window.scrollTo(0,0);
 }
 
-function updateCartUI() {
-    document.getElementById("cartCount").innerText = cart.length;
-    const list = document.getElementById("cartItems");
-    let total = 0;
-    list.innerHTML = cart.length ? "" : "<p style='color:#999'>Your cart is empty.</p>";
-
-    cart.forEach((item, idx) => {
-        total += item.price;
-        list.innerHTML += `
-            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee;">
-                <span>${item.name}</span>
-                <span><b>₹${item.price}</b> <button onclick="removeFromCart('${item.name}')" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">Remove</button></span>
-            </div>`;
-    });
-    document.getElementById("totalPrice").innerText = total;
+function validateDetails() {
+    const n = document.getElementById("c-name").value;
+    const p = document.getElementById("c-phone").value;
+    const a = document.getElementById("c-address").value;
+    if(!n || !p || !a) return alert("All delivery fields are required!");
+    switchPage('payment-page');
 }
 
-function startPayment() {
-    if(!cart.length) return alert("Add items first!");
-    document.getElementById("payOverlay").style.display = "flex";
+// 5. FINALIZE & TRACKING
+function finalizeOrder() {
+    const method = document.querySelector('input[name="pay-method"]:checked');
+    if(!method) return alert("Select a payment method!");
+
+    document.getElementById("loading-overlay").style.display = "flex";
     
     setTimeout(() => {
-        const orderId = "ORD" + Math.floor(Math.random() * 999999);
-        const total = cart.reduce((a, b) => a + b.price, 0);
-        const today = new Date().toLocaleDateString();
+        document.getElementById("loading-overlay").style.display = "none";
+        const trackId = "CAD-" + Math.floor(Math.random() * 8999999 + 1000000);
+        document.getElementById("display-track-id").innerText = trackId;
+        document.getElementById("user-msg").innerText = `Great choice, ${document.getElementById("c-name").value}!`;
         
-        if(!orders[user]) orders[user] = [];
-        orders[user].push({ id: orderId, total, date: today });
-        
-        localStorage.setItem("allOrders", JSON.stringify(orders));
         cart = [];
-        document.getElementById("payOverlay").style.display = "none";
-        updateCartUI();
-        renderOrders();
-        renderProducts();
-        alert("Order Successful! Transaction ID: " + orderId);
-    }, 2000);
+        updateUI();
+        switchPage('success-page');
+    }, 2500);
 }
 
-function renderOrders() {
-    const box = document.getElementById("orderHistory");
-    box.innerHTML = "";
-    if(!user || !orders[user]) {
-        box.innerHTML = "<p>Login to view your history.</p>";
-        return;
-    }
-
-    orders[user].slice().reverse().forEach(o => {
-        box.innerHTML += `
-            <div style="background:#f1f1f1; padding:15px; border-radius:10px; margin-bottom:15px;">
-                <div style="display:flex; justify-content:space-between;">
-                    <b>ID: ${o.id}</b>
-                    <span style="color:green; font-weight:bold;">₹${o.total}</span>
-                </div>
-                <p style="font-size:12px; color:#666;">Date: ${o.date}</p>
-                <div class="stepper">
-                    <div class="step active">Placed</div>
-                    <div class="step active">Packed</div>
-                    <div class="step active">Shipped</div>
-                    <div class="step">Delivered</div>
-                </div>
-            </div>`;
-    });
-}
-
-// UI & AUTH
-function openModal(id) { document.getElementById(id).style.display = "flex"; }
-function closeModal(id) { document.getElementById(id).style.display = "none"; }
-
-function login() {
-    const val = document.getElementById("userInp").value;
-    if(val) {
-        user = val;
-        localStorage.setItem("activeUser", val);
-        location.reload();
-    }
-}
-
-function logout() {
-    localStorage.removeItem("activeUser");
-    location.reload();
-}
-
-function adminAdd() {
-    const n = document.getElementById("admName").value;
-    const p = document.getElementById("admPrice").value;
-    const i = document.getElementById("admImg").value;
-    const d = document.getElementById("admDesc").value;
-    if(n && p) {
-        products.push({name:n, price:+p, img:i, desc:d});
-        localStorage.setItem("prods", JSON.stringify(products));
-        renderProducts();
-        closeModal('adminModal');
-    }
-}
-
-function adminDel(i) {
-    products.splice(i, 1);
-    localStorage.setItem("prods", JSON.stringify(products));
-    renderProducts();
-}
-
-// INIT RUN
-if(user) {
-    document.getElementById("userName").innerText = "Welcome, " + user;
-    document.getElementById("authBtn").style.display = "none";
-    document.getElementById("logoutBtn").style.display = "block";
-    if(user === "admin") document.getElementById("adminBtn").style.display = "block";
-}
+// INITIALIZE
 renderProducts();
-renderOrders();
-updateCartUI();
 </script>
-
 </body>
 </html>
