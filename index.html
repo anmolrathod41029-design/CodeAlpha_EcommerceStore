@@ -45,6 +45,8 @@
         .history-item { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; background: var(--success); color: white; }
 
+        .sample-login-info { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 0.85rem; border: 1px dashed var(--primary); }
+
         #loading { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -55,7 +57,7 @@
 <nav>
     <div class="logo" onclick="showPage('home')">EliteCommerce</div>
     <div class="nav-right">
-        <input type="text" id="search" placeholder="Search tech..." onkeyup="renderProducts()">
+        <input type="text" id="search" placeholder="Search 528 items..." onkeyup="renderProducts()">
         <button class="btn" style="background:none; color:white;" onclick="toggleTheme()">🌓</button>
         <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 <span id="cart-count">0</span></button>
         <button class="btn btn-outline" style="border-color:white; color:white;" onclick="checkAuth('history')">📜 Orders</button>
@@ -66,12 +68,17 @@
 <div id="loading"><div class="spinner"></div><h2 style="margin-top:20px;">Processing...</h2></div>
 
 <div id="auth" class="page">
-    <div class="box" id="auth-box">
+    <div class="box">
         <h2 id="auth-title">Login to Elite</h2>
         <input type="text" id="auth-user" placeholder="Username">
         <input type="password" id="auth-pass" placeholder="Password">
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">Submit</button>
-        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Switch Login/Register</p>
+        <div class="sample-login-info">
+            <strong>Sample Credentials:</strong><br>
+            User: <code>admin</code><br>
+            Pass: <code>123</code>
+        </div>
+        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Don't have an account? Register</p>
     </div>
 </div>
 
@@ -120,50 +127,70 @@
 <div id="success" class="page">
     <div class="box" style="text-align:center;">
         <h1 style="color:var(--success)">🎉 Success!</h1>
-        <p>Your order has been placed successfully.</p>
+        <p>Order Placed Successfully.</p>
         <div style="background:var(--bg); padding:20px; border-radius:15px; margin:20px 0;">
             <p>ID: <b id="final-tid"></b></p>
         </div>
-        <button class="btn btn-primary" onclick="showPage('home')">Continue Shopping</button>
+        <button class="btn btn-primary" onclick="showPage('home')">Return Home</button>
     </div>
 </div>
 
 <script>
-// Data Initialization
-const baseItems = [
-    { n: "Precision Laptop", p: 72000, i: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500" },
-    { n: "Elite Buds Pro", p: 14999, i: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" },
-    { n: "Infinity Watch", p: 5999, i: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" }
+// Logic for Hardcoded Sample Login
+const sampleUsers = {"admin": "123"};
+let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
+
+// Image Pool for Randomization
+const imgPool = [
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
+    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=500",
+    "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500",
+    "https://images.unsplash.com/photo-1586105251261-72a756497a7a?w=500",
+    "https://images.unsplash.com/photo-1486401899868-0e435ed85128?w=500"
 ];
+
 let products = [];
 for(let i=0; i<528; i++) {
-    let b = baseItems[i % baseItems.length];
-    products.push({ id: i, name: `${b.n} v${i+1}`, price: b.p + (i*5), img: b.i });
+    const randomImg = imgPool[Math.floor(Math.random() * imgPool.length)];
+    products.push({ 
+        id: i, 
+        name: `Elite Tech v${i+1}`, 
+        price: 2000 + (Math.floor(Math.random() * 50000)), 
+        img: randomImg 
+    });
 }
+
+// Fisher-Yates Shuffle for truly random sorting on load
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+shuffle(products);
 
 let cart = [];
 let currentUser = localStorage.getItem("activeUser") || null;
-let users = JSON.parse(localStorage.getItem("users")) || {};
 let allOrders = JSON.parse(localStorage.getItem("orders")) || {};
 let isLoginMode = true;
 
-// Auth Logic
 function toggleAuthMode() {
     isLoginMode = !isLoginMode;
-    document.getElementById("auth-title").innerText = isLoginMode ? "Login to Elite" : "Register Account";
+    document.getElementById("auth-title").innerText = isLoginMode ? "Login to Elite" : "Create Account";
 }
 
 function handleAuth() {
     const u = document.getElementById("auth-user").value;
     const p = document.getElementById("auth-pass").value;
-    if(!u || !p) return alert("Fill all fields");
+    if(!u || !p) return alert("Please enter details");
 
     if(isLoginMode) {
-        if(users[u] && users[u] === p) {
-            login(u);
-        } else alert("Invalid credentials");
+        if(users[u] && users[u] === p) { login(u); } 
+        else alert("Invalid credentials. Try admin / 123");
     } else {
-        if(users[u]) return alert("User exists");
+        if(users[u]) return alert("Username taken");
         users[u] = p;
         localStorage.setItem("users", JSON.stringify(users));
         login(u);
@@ -173,43 +200,26 @@ function handleAuth() {
 function login(u) {
     currentUser = u;
     localStorage.setItem("activeUser", u);
-    updateNav();
+    document.getElementById("user-display").innerText = `👤 ${u}`;
     showPage('home');
 }
 
-function logout() {
-    if(confirm("Logout?")) {
-        localStorage.removeItem("activeUser");
-        location.reload();
-    }
-}
+function logout() { localStorage.removeItem("activeUser"); location.reload(); }
 
-function checkAuth(target) {
-    if(!currentUser) {
-        showPage('auth');
-    } else {
-        showPage(target);
-    }
-}
+function checkAuth(target) { !currentUser ? showPage('auth') : showPage(target); }
 
-function updateNav() {
-    document.getElementById("user-display").innerText = currentUser ? `👤 ${currentUser}` : "";
-}
-
-// Store Logic
 function renderProducts() {
     const grid = document.getElementById("product-grid");
     const q = document.getElementById("search").value.toLowerCase();
     grid.innerHTML = "";
     products.filter(p => p.name.toLowerCase().includes(q)).slice(0, 20).forEach(p => {
-        const inCart = cart.some(c => c.id === p.id);
         grid.innerHTML += `
             <div class="card">
                 <img src="${p.img}">
                 <div class="card-body">
                     <h3>${p.name}</h3>
                     <div class="price">₹${p.price}</div>
-                    <button class="btn btn-primary" onclick="addToCart(${p.id})">${inCart ? 'In Cart' : 'Add to Cart'}</button>
+                    <button class="btn btn-primary" onclick="addToCart(${p.id})">Add to Cart</button>
                 </div>
             </div>`;
     });
@@ -217,45 +227,30 @@ function renderProducts() {
 
 function addToCart(id) {
     if(!currentUser) return showPage('auth');
-    if(!cart.some(c => c.id === id)) cart.push(products[id]);
+    const p = products.find(prod => prod.id === id);
+    if(!cart.some(c => c.id === id)) cart.push(p);
     updateCart();
 }
 
 function updateCart() {
     document.getElementById("cart-count").innerText = cart.length;
     let list = document.getElementById("cart-items-list");
-    let total = 0;
-    list.innerHTML = cart.length ? "" : "<h4>Empty Cart</h4>";
-    cart.forEach(item => {
-        total += item.price;
-        list.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span>${item.name}</span><b>₹${item.price}</b>
-        </div>`;
-    });
+    let total = cart.reduce((acc, item) => acc + item.price, 0);
+    list.innerHTML = cart.map(i => `<div style="display:flex; justify-content:space-between"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('');
     document.getElementById("sum-total").innerText = "₹" + Math.round(total * 1.18);
 }
 
 function processOrder() {
-    const tid = "ELITE-" + Date.now();
-    const orderData = {
-        id: tid,
-        date: new Date().toLocaleDateString(),
-        total: document.getElementById("sum-total").innerText,
-        items: cart.map(i => i.name).join(", "),
-        status: "Shipped"
-    };
-
+    const tid = "TID-" + Date.now();
+    const orderData = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, items: cart.length + " Items", status: "In Transit" };
     document.getElementById("loading").style.display = "flex";
     setTimeout(() => {
         if(!allOrders[currentUser]) allOrders[currentUser] = [];
         allOrders[currentUser].push(orderData);
         localStorage.setItem("orders", JSON.stringify(allOrders));
-        
-        cart = [];
-        updateCart();
+        cart = []; updateCart();
         document.getElementById("final-tid").innerText = tid;
         document.getElementById("loading").style.display = "none";
-        renderHistory();
         showPage('success');
     }, 2000);
 }
@@ -263,23 +258,9 @@ function processOrder() {
 function renderHistory() {
     const list = document.getElementById("order-history-list");
     list.innerHTML = "";
-    if(!currentUser || !allOrders[currentUser]) {
-        list.innerHTML = "<p style='text-align:center;'>No orders yet.</p>";
-        return;
-    }
+    if(!currentUser || !allOrders[currentUser]) return list.innerHTML = "<p>No orders yet.</p>";
     allOrders[currentUser].slice().reverse().forEach(o => {
-        list.innerHTML += `
-            <div class="history-item">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <b>Order ${o.id}</b>
-                    <span class="status-badge">${o.status}</span>
-                </div>
-                <p style="font-size:0.9rem; color:#888;">Items: ${o.items}</p>
-                <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                    <span>Date: ${o.date}</span>
-                    <b style="color:var(--primary)">${o.total}</b>
-                </div>
-            </div>`;
+        list.innerHTML += `<div class="history-item"><b>${o.id}</b> - ${o.total} <span class="status-badge">${o.status}</span><br><small>${o.date}</small></div>`;
     });
 }
 
@@ -292,9 +273,8 @@ function showPage(id) {
 function toggleTheme() { document.body.classList.toggle("dark-mode"); }
 
 // Init
-updateNav();
+if(currentUser) document.getElementById("user-display").innerText = `👤 ${currentUser}`;
 renderProducts();
-renderHistory();
 </script>
 </body>
 </html>
