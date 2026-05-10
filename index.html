@@ -31,7 +31,7 @@
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; margin-top: 20px; }
         .card { background: var(--card); border-radius: 18px; overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); text-align: center; }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card img { width: 100%; height: 200px; object-fit: cover; display: block; }
         .card-body { padding: 20px; }
         .price { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
 
@@ -72,13 +72,13 @@
         <input type="text" id="auth-user" placeholder="Username">
         <input type="password" id="auth-pass" placeholder="Password">
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">Submit</button>
-        <p style="font-size: 0.8rem; margin-top: 10px; color: #888;">Test Credentials: admin / 123</p>
-        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Register New Account</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; color: #888;">Sample: admin / 123</p>
+        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Create Account</p>
     </div>
 </div>
 
 <div id="home" class="page active-page">
-    <h2 style="text-align: center;">Verified Premium Tech</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">Premium Curated Tech</h2>
     <div class="grid" id="product-grid"></div>
 </div>
 
@@ -88,7 +88,7 @@
         <div id="cart-items-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;"></div>
         <hr><br>
         <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.2rem;"><span>Total</span><b id="sum-total">₹0</b></div>
-        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Delivery Details →</button>
+        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Shipping Details →</button>
     </div>
 </div>
 
@@ -97,8 +97,10 @@
         <h2>Shipping Information</h2>
         <input type="text" id="c-name" placeholder="Full Name">
         <input type="email" id="c-email" placeholder="Email Address">
-        <input type="text" id="c-phone" placeholder="Primary Phone">
-        <input type="text" id="c-alt-phone" placeholder="Alternate Phone (Optional)">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="c-phone" placeholder="Primary Phone" style="flex: 1;">
+            <input type="text" id="c-alt-phone" placeholder="Alt Phone" style="flex: 1;">
+        </div>
         <textarea id="c-addr" placeholder="Full Address" rows="3"></textarea>
         <select id="c-type">
             <option value="Residential">Residential (Home)</option>
@@ -124,14 +126,14 @@
 <div id="history" class="page">
     <div style="display:flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 30px;">
         <h2>Order History</h2>
-        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 5px 15px;" onclick="clearHistory()">Clear All</button>
+        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 5px 15px;" onclick="clearHistory()">Clear History</button>
     </div>
     <div id="order-history-list" style="max-width: 800px; margin: 0 auto;"></div>
 </div>
 
 <div id="success" class="page">
     <div class="box" style="text-align:center;">
-        <h1 style="color:var(--success)">🎉 Confirmed!</h1>
+        <h1 style="color:var(--success)">🎉 Order Placed!</h1>
         <p>Order ID: <b id="final-tid"></b></p>
         <button class="btn btn-primary" style="margin-top: 20px;" onclick="showPage('home')">Return Home</button>
     </div>
@@ -141,15 +143,15 @@
 const sampleUsers = {"admin": "123"};
 let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
 
-// Strictly using verified, active image links
+// Verified image pool - no broken links allowed
 const imgPool = [
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
-    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",
-    "https://images.unsplash.com/photo-1526170315873-3a98bc88a853?w=500",
-    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500",
-    "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=500",
-    "https://images.unsplash.com/photo-1583394838336-397f33838685?w=500"
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80",
+    "https://images.unsplash.com/photo-1526170315873-3a98bc88a853?w=500&q=80",
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80",
+    "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=500&q=80",
+    "https://images.unsplash.com/photo-1583394838336-397f33838685?w=500&q=80"
 ];
 
 let products = [];
@@ -172,12 +174,12 @@ function renderProducts() {
     const q = document.getElementById("search").value.toLowerCase();
     grid.innerHTML = "";
     
-    // STRICT FILTER: Only render if image is present
+    // Strict Filtering: If image URL is somehow missing, the card doesn't render
     products.filter(p => p.name.toLowerCase().includes(q) && p.img).slice(0, 24).forEach(p => {
         const inCart = cart.some(c => c.id === p.id);
         grid.innerHTML += `
             <div class="card">
-                <img src="${p.img}">
+                <img src="${p.img}" loading="lazy">
                 <div class="card-body">
                     <h3>${p.name}</h3>
                     <div class="price">₹${p.price}</div>
@@ -209,12 +211,15 @@ function updateCart() {
     document.getElementById("cart-count").innerText = cart.length;
     let list = document.getElementById("cart-items-list");
     let total = cart.reduce((acc, item) => acc + item.price, 0);
-    list.innerHTML = cart.length ? cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('') : "<p style='text-align:center'>Cart is empty</p>";
+    list.innerHTML = cart.length ? cart.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+            <span>${i.name}</span><b>₹${i.price}</b>
+        </div>`).join('') : "<p style='text-align:center'>Empty Cart</p>";
     document.getElementById("sum-total").innerText = "₹" + total;
 }
 
 function validateDetails() {
-    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("Fill Name, Phone, and Address!");
+    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("Fill all required fields!");
     showPage('payment');
 }
 
@@ -240,14 +245,14 @@ function renderHistory() {
     if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) { btn.style.display = "none"; return list.innerHTML = "<p style='text-align:center'>No orders yet.</p>"; }
     btn.style.display = "block";
     allOrders[currentUser].slice().reverse().forEach(o => {
-        list.innerHTML += `<div class="history-item"><div style="display:flex; justify-content:space-between"><b>Order #${o.id}</b><span class="status-badge">${o.type}</span></div><p>Qty: ${o.count} | Amount: ${o.total}</p><small>${o.date}</small></div>`;
+        list.innerHTML += `<div class="history-item"><div style="display:flex; justify-content:space-between"><b>Order #${o.id}</b><span class="status-badge">${o.type} Delivery</span></div><p>Qty: ${o.count} | Amount: ${o.total}</p><small>${o.date}</small></div>`;
     });
 }
 
-function clearHistory() { if(confirm("Clear history?")) { allOrders[currentUser] = []; localStorage.setItem("orders", JSON.stringify(allOrders)); renderHistory(); } }
+function clearHistory() { if(confirm("Clear order history?")) { allOrders[currentUser] = []; localStorage.setItem("orders", JSON.stringify(allOrders)); renderHistory(); } }
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); if(id === 'history') renderHistory(); if(id === 'home') renderProducts(); window.scrollTo(0,0); }
 function toggleTheme() { document.body.classList.toggle("dark-mode"); }
-function handleAuth() { const u = document.getElementById("auth-user").value; const p = document.getElementById("auth-pass").value; if(isLoginMode) { if(users[u] && users[u] === p) login(u); else alert("Invalid Login"); } else { if(users[u]) return alert("User exists"); users[u] = p; localStorage.setItem("users", JSON.stringify(users)); login(u); } }
+function handleAuth() { const u = document.getElementById("auth-user").value; const p = document.getElementById("auth-pass").value; if(isLoginMode) { if(users[u] && users[u] === p) login(u); else alert("Login Failed!"); } else { if(users[u]) return alert("User exists"); users[u] = p; localStorage.setItem("users", JSON.stringify(users)); login(u); } }
 function login(u) { currentUser = u; localStorage.setItem("activeUser", u); document.getElementById("user-display").innerText = `👤 ${u}`; showPage('home'); }
 function logout() { localStorage.removeItem("activeUser"); location.reload(); }
 function checkAuth(target) { !currentUser ? showPage('auth') : showPage(target); }
