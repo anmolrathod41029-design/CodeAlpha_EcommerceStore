@@ -1,547 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>CodeAlpha E-commerce Store</title>
-
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      background:#f4f4f4;
-      transition:0.3s;
-    }
-
-    .dark{
-      background:#111;
-      color:white;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeAlpha Store - Advanced</title>  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+    body{background:#f4f4f4;transition:0.3s;}
+    .dark{background:#111;color:white;}
 
     nav{
-      background:#111;
-      color:white;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:15px 20px;
-      position:sticky;
-      top:0;
-      z-index:1000;
+      background:#111;color:white;
+      display:flex;justify-content:space-between;
+      align-items:center;padding:15px 20px;
+      position:sticky;top:0;z-index:1000;
     }
 
-    nav h1{
-      font-size:22px;
+    nav .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+    nav input{padding:8px;border-radius:8px;border:none;outline:none;}
+    nav button{background:orange;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:bold;}
+
+    .hero{background:linear-gradient(to right,#111,#444);color:white;text-align:center;padding:50px 20px;}
+
+    .container{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:25px;}
+
+    .product{background:white;width:260px;border-radius:15px;overflow:hidden;box-shadow:0 0 10px rgba(0,0,0,0.2);}
+    .product img{width:100%;height:200px;object-fit:cover;}
+    .product-content{text-align:center;padding:12px;}
+
+    .price{color:green;font-size:18px;font-weight:bold;}
+
+    .btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
+    .cart-btn{background:green;color:white;}
+    .buy-btn{background:#111;color:white;}
+
+    .cart-section{background:white;margin:25px;padding:20px;border-radius:15px;}
+
+    .toast{position:fixed;bottom:20px;right:20px;background:black;color:white;padding:10px;border-radius:10px;display:none;}
+
+    .modal{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+      justify-content:center;align-items:center;
     }
 
-    nav .nav-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    .modal-content{
+      background:white;padding:20px;border-radius:10px;width:300px;
     }
 
-    nav input{
-      padding:8px;
-      border:none;
-      border-radius:8px;
-      outline:none;
+    .modal-content input{width:100%;padding:8px;margin:5px 0;}
+
+    .orders{
+      background:#fff;margin:25px;padding:20px;border-radius:15px;
     }
-
-    nav button{
-      background:orange;
-      border:none;
-      padding:10px 15px;
-      border-radius:8px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .hero{
-      background:linear-gradient(to right,#111,#444);
-      color:white;
-      text-align:center;
-      padding:60px 20px;
-    }
-
-    .hero h2{
-      font-size:40px;
-      margin-bottom:10px;
-    }
-
-    .hero p{
-      font-size:18px;
-    }
-
-    .container{
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:20px;
-      padding:30px;
-    }
-
-    .product{
-      background:white;
-      width:280px;
-      border-radius:15px;
-      overflow:hidden;
-      box-shadow:0 0 10px rgba(0,0,0,0.2);
-      transition:0.3s;
-    }
-
-    .product:hover{
-      transform:scale(1.05);
-    }
-
-    .product img{
-      width:100%;
-      height:220px;
-      object-fit:cover;
-    }
-
-    .product-content{
-      padding:15px;
-      text-align:center;
-    }
-
-    .badge{
-      background:red;
-      color:white;
-      padding:5px 10px;
-      border-radius:20px;
-      font-size:12px;
-      display:inline-block;
-      margin-bottom:10px;
-    }
-
-    .product-content h3{
-      margin-bottom:10px;
-    }
-
-    .price{
-      color:green;
-      font-size:22px;
-      font-weight:bold;
-      margin-bottom:10px;
-    }
-
-    .rating{
-      color:gold;
-      margin-bottom:10px;
-    }
-
-    .btn-group{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      margin-top:15px;
-    }
-
-    .btn{
-      border:none;
-      padding:10px 15px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .cart-btn{
-      background:green;
-      color:white;
-    }
-
-    .buy-btn{
-      background:#111;
-      color:white;
-    }
-
-    .cart-section{
-      background:white;
-      margin:30px;
-      padding:25px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .cart-section h2{
-      margin-bottom:20px;
-    }
-
-    #cartItems li{
-      list-style:none;
-      background:#f2f2f2;
-      margin-bottom:10px;
-      padding:10px;
-      border-radius:8px;
-    }
-
-    .total{
-      margin-top:20px;
-      font-size:24px;
-      font-weight:bold;
-      color:green;
-    }
-
-    .place-order{
-      margin-top:20px;
-      background:orange;
-      border:none;
-      padding:12px 20px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:16px;
-      font-weight:bold;
-    }
-
-    footer{
-      background:#111;
-      color:white;
-      text-align:center;
-      padding:20px;
-      margin-top:30px;
-    }
-
-    .toast{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:black;
-      color:white;
-      padding:15px;
-      border-radius:10px;
-      display:none;
-    }
-
-  </style>
-</head>
-
-<body>
-
-  <nav>
-
-    <h1>🛒 CodeAlpha Store</h1>
-
-    <div class="nav-right">
-
-      <input
-        type="text"
-        id="search"
-        placeholder="Search Product"
-        onkeyup="searchProducts()"
-      >
-
-      <button onclick="toggleMode()">
-        🌙
-      </button>
-
-      <button>
-        Cart 🛍 (<span id="count">0</span>)
-      </button>
-
-    </div>
-
-  </nav>
-
-
-  <section class="hero">
-
-    <h2>Welcome to CodeAlpha Store</h2>
-
-    <p>Best Deals on Electronics & Fashion</p>
-
-  </section>
-
-
-  <div class="container">
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Smart Watch</h3>
-
-        <p class="price">₹1999</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Premium smart watch with fitness tracking.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Smart Watch',1999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Smart Watch')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Headphones</h3>
-
-        <p class="price">₹999</p>
-
-        <div class="rating">★★★★☆</div>
-
-        <p>Wireless noise cancellation headphones.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Headphones',999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Headphones')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Running Shoes</h3>
-
-        <p class="price">₹2499</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Comfortable running shoes for daily use.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Running Shoes',2499)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Running Shoes')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="product">
-
-      <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500">
-
-      <div class="product-content">
-
-        <div class="badge">SALE</div>
-
-        <h3>Smart Phone</h3>
-
-        <p class="price">₹14999</p>
-
-        <div class="rating">★★★★★</div>
-
-        <p>Latest smartphone with amazing camera quality.</p>
-
-        <div class="btn-group">
-
-          <button class="btn cart-btn" onclick="addToCart('Smart Phone',14999)">
-            Add to Cart
-          </button>
-
-          <button class="btn buy-btn" onclick="buyNow('Smart Phone')">
-            Buy Now
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
+  </style></head>
+<body><nav>
+  <h1>🛒 CodeAlpha Store</h1>  <div class="right">
+    <input id="search" placeholder="Search" onkeyup="renderProducts()" />
+    <button onclick="toggleMode()">🌙</button>
+    <button onclick="openAuth()">Login</button>
+    <button onclick="logout()">Logout</button>
+    <span id="user"></span>
+    <button>🛍 <span id="count">0</span></button>
   </div>
-
-
-
-  <section class="cart-section">
-
-    <h2>🛍 Shopping Cart</h2>
-
-    <ul id="cartItems"></ul>
-
-    <div class="total">
-      Total: ₹<span id="total">0</span>
-    </div>
-
-    <button class="place-order" onclick="placeOrder()">
-      Place Order
-    </button>
-
-  </section>
-
-
-
-  <footer>
-
-    <p>© 2026 CodeAlpha E-commerce Store | Made by Anmol</p>
-
-  </footer>
-
-
-
-  <div id="toast" class="toast">
-    Product Added Successfully ✅
+</nav><section class="hero">
+  <h2>Smart Shopping Experience</h2>
+  <p>Dynamic Store with Login & Orders</p>
+</section><div class="container" id="productList"></div><section class="cart-section">
+  <h2>Cart</h2>
+  <ul id="cartItems"></ul>
+  <p>Total: ₹<span id="total">0</span></p>
+  <button onclick="placeOrder()">Place Order</button>
+  <input id="coupon" placeholder="Coupon code" />
+  <button onclick="applyCoupon()">Apply</button>
+</section><section class="orders">
+  <h2>Your Orders</h2>
+  <div id="orderList"></div>
+</section><footer>© 2026 CodeAlpha</footer><div class="toast" id="toast">Done ✔</div><div class="modal" id="auth">
+  <div class="modal-content">
+    <h3 id="title">Login</h3>
+    <input id="u" placeholder="Username" />
+    <input id="p" type="password" placeholder="Password" />
+    <button onclick="auth()">Submit</button>
+    <p onclick="toggle()" style="cursor:pointer;color:blue">Switch</p>
   </div>
+</div><script>
 
+let products=[
+ {n:"Smart Watch",p:1999},
+ {n:"Headphones",p:999},
+ {n:"Shoes",p:2499},
+ {n:"Phone",p:14999}
+];
 
+let cart=[];
+let users=JSON.parse(localStorage.getItem("u")||"{}");
+let cur=localStorage.getItem("cur");
+let login=true;
+let orders=JSON.parse(localStorage.getItem("o")||"{}");
 
-  <script>
+renderProducts();
+updateUser();
+renderOrders();
 
-    let cartCount = 0;
+function renderProducts(){
+let box=document.getElementById("productList");
+let s=document.getElementById("search").value?.toLowerCase()||"";
+box.innerHTML="";
 
-    let totalPrice = 0;
+products.filter(x=>x.n.toLowerCase().includes(s)).forEach((x,i)=>{
+box.innerHTML+=`
+<div class='product'>
+<div class='product-content'>
+<h3>${x.n}</h3>
+<p class='price'>₹${x.p}</p>
+<button class='btn cart-btn' onclick='add(${i})'>Add</button>
+</div></div>`;
+});
+}
 
+function add(i){
+if(!cur)return alert("Login required");
+cart.push(products[i]);
+updateCart();
+toast();
+}
 
+function updateCart(){
+document.getElementById("count").innerText=cart.length;
+document.getElementById("cartItems").innerHTML="";
+let t=0;
+cart.forEach(x=>{
+ t+=x.p;
+ document.getElementById("cartItems").innerHTML+=`<li>${x.n} ₹${x.p}</li>`;
+});
+document.getElementById("total").innerText=t;
+}
 
-    function addToCart(product, price){
+function placeOrder(){
+if(!cart.length)return;
+let id="OD"+Date.now();
+if(!orders[cur])orders[cur]=[];
+orders[cur].push({id,items:[...cart],date:new Date().toLocaleString()});
+localStorage.setItem("o",JSON.stringify(orders));
+cart=[];
+updateCart();
+renderOrders();
+alert("Order ID: "+id);
+}
 
-      cartCount++;
+function renderOrders(){
+let box=document.getElementById("orderList");
+box.innerHTML="";
+if(!orders[cur])return;
+orders[cur].forEach(o=>{
+box.innerHTML+=`<p>🧾 ${o.id} - ${o.items.length} items</p>`;
+});
+}
 
-      document.getElementById("count").innerText = cartCount;
+function toggleMode(){document.body.classList.toggle("dark");}
 
-      totalPrice += price;
+function toast(){
+document.getElementById("toast").style.display="block";
+setTimeout(()=>toast.style.display="none",1200);
+}
 
-      document.getElementById("total").innerText = totalPrice;
+function openAuth(){document.getElementById("auth").style.display="flex";}
 
-      let li = document.createElement("li");
+function toggle(){login=!login;document.getElementById("title").innerText=login?"Login":"Register";}
 
-      li.innerHTML = product + " - ₹" + price;
+function auth(){
+let u=u.value,p=p.value;
+if(login){
+if(users[u]==p){cur=u;localStorage.setItem("cur",u);updateUser();}
+else alert("Wrong");
+}else{
+users[u]=p;localStorage.setItem("u",JSON.stringify(users));toggle();}
+}
 
-      document.getElementById("cartItems").appendChild(li);
+function updateUser(){document.getElementById("user").innerText=cur?"👤 "+cur:"";}
 
-      showToast();
-    }
+function logout(){cur=null;localStorage.removeItem("cur");updateUser();}
 
-
-
-    function buyNow(product){
-
-      alert("Redirecting to payment for " + product);
-
-    }
-
-
-
-    function placeOrder(){
-
-      if(cartCount === 0){
-
-        alert("Your cart is empty!");
-
-      }
-
-      else{
-
-        alert("Order placed successfully!");
-
-      }
-
-    }
-
-
-
-    function toggleMode(){
-
-      document.body.classList.toggle("dark");
-
-    }
-
-
-
-    function showToast(){
-
-      let toast = document.getElementById("toast");
-
-      toast.style.display = "block";
-
-      setTimeout(() => {
-
-        toast.style.display = "none";
-
-      },2000);
-
-    }
-
-
-
-    function searchProducts(){
-
-      let input = document.getElementById("search").value.toLowerCase();
-
-      let products = document.getElementsByClassName("product");
-
-      for(let i=0;i<products.length;i++){
-
-        let title = products[i].innerText.toLowerCase();
-
-        if(title.includes(input)){
-
-          products[i].style.display = "block";
-
-        }
-
-        else{
-
-          products[i].style.display = "none";
-
-        }
-
-      }
-
-    }
-
-  </script>
-
-</body>
+</script></body>
 </html>
