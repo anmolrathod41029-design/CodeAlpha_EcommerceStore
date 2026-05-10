@@ -41,6 +41,7 @@ width:260px;
 border-radius:15px;
 overflow:hidden;
 box-shadow:0 0 10px rgba(0,0,0,0.2);
+position:relative;
 }
 
 .product img{width:100%;height:200px;object-fit:cover;}
@@ -50,59 +51,28 @@ box-shadow:0 0 10px rgba(0,0,0,0.2);
 
 .btn{padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;}
 .cart-btn{background:green;color:white;}
+.delete-btn{background:red;color:white;margin-top:5px;}
 
-.section{
-background:white;
-margin:20px;
-padding:20px;
-border-radius:15px;
-}
+.section{background:white;margin:20px;padding:20px;border-radius:15px;}
 
-.toast{
-position:fixed;
-bottom:20px;
-right:20px;
-background:black;
-color:white;
-padding:10px;
-border-radius:10px;
-display:none;
-}
+.toast{position:fixed;bottom:20px;right:20px;background:black;color:white;padding:10px;border-radius:10px;display:none;}
 
-.modal{
-display:none;
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.6);
-justify-content:center;
-align-items:center;
-}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;}
 
-.modal-content{
-background:white;
-padding:20px;
-border-radius:10px;
-width:320px;
-text-align:center;
-}
+.modal-content{background:white;padding:20px;border-radius:10px;width:320px;text-align:center;position:relative;}
 
 .modal-content input{width:100%;padding:8px;margin:5px 0;}
 
-.sample{
-margin-top:10px;
-padding:10px;
-background:#f2f2f2;
-border-radius:8px;
-font-size:13px;
-color:#333;
-}
+.close{position:absolute;right:10px;top:5px;cursor:pointer;font-size:18px;}
+
+.sample{margin-top:10px;padding:10px;background:#f2f2f2;border-radius:8px;font-size:13px;}
 
 </style></head>
 <body><nav>
 <h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
 <input id="search" placeholder="Search products" onkeyup="renderProducts()" />
 <button onclick="toggleMode()">🌙</button>
-<button onclick="openAuth()">Login</button>
+<button onclick="openAuth()">Login/Register</button>
 <button onclick="openAdmin()">Admin</button>
 <span id="user"></span>
 <button>🛍 <span id="count">0</span></button>
@@ -114,21 +84,26 @@ color:#333;
 <h2>Cart</h2>
 <ul id="cartItems"></ul>
 <p>Total: ₹<span id="total">0</span></p>
-<button onclick="checkout()">Checkout (Razorpay Mock)</button>
+<button onclick="checkout()">Checkout (Mock)</button>
 </div><div class="section">
 <h2>Orders</h2>
 <div id="orders"></div>
 </div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><!-- AUTH --><div class="modal" id="authModal">
 <div class="modal-content">
-<h3>Login</h3><input id="email" placeholder="Email" />
+<span class="close" onclick="closeAuth()">✖</span>
+<h3 id="authTitle">Login</h3>
+<input id="email" placeholder="Username" />
 <input id="pass" type="password" placeholder="Password" />
-<button onclick="login()">Login</button><div class="sample">
-<b>Sample Login (For Testing)</b><br>
+<button onclick="login()">Submit</button>
+<p onclick="toggleAuth()" style="cursor:pointer;color:blue">Switch Login/Register</p><div class="sample">
+<b>Sample Login</b><br>
 Username: admin<br>
 Password: admin123
-</div></div>
+</div>
+</div>
 </div><!-- ADMIN --><div class="modal" id="adminModal">
 <div class="modal-content">
+<span class="close" onclick="closeAdmin()">✖</span>
 <h3>Admin Panel</h3>
 <input id="pname" placeholder="Product Name" />
 <input id="pprice" placeholder="Price" />
@@ -139,17 +114,16 @@ Password: admin123
 </div><script>
 
 let products = JSON.parse(localStorage.getItem("products")) || [
-{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking smartwatch"},
+{name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness smartwatch"},
 {name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
 ];
 
 let cart=[];
 let user=localStorage.getItem("user");
 let orders=JSON.parse(localStorage.getItem("orders"))||{};
+let isLogin=true;
 
-renderProducts();
-updateUI();
-renderOrders();
+renderProducts();updateUI();renderOrders();
 
 function renderProducts(){
 let box=document.getElementById("productList");
@@ -165,86 +139,70 @@ box.innerHTML+=`
 <p class='desc'>${p.desc}</p>
 <p class='price'>₹${p.price}</p>
 <button class='btn cart-btn' onclick='add(${i})'>Add</button>
+<button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>
 </div></div>`;
 });
 }
 
-function add(i){
-if(!user)return alert("Login required");
-cart.push(products[i]);
-updateCart();
+function add(i){if(!user)return alert("Login required");cart.push(products[i]);updateCart();}
+
+function deleteProduct(i){
+if(user!="admin")return alert("Only admin can delete");
+products.splice(i,1);
+localStorage.setItem("products",JSON.stringify(products));
+renderProducts();
 }
 
 function updateCart(){
 document.getElementById("count").innerText=cart.length;
 let t=0;
 document.getElementById("cartItems").innerHTML="";
-cart.forEach(c=>{
-t+=c.price;
-document.getElementById("cartItems").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
-});
+cart.forEach(c=>{t+=c.price;document.getElementById("cartItems").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;});
 document.getElementById("total").innerText=t;
 }
 
-function checkout(){
-if(!cart.length)return;
-let orderId="ORD"+Date.now();
+function checkout(){if(!cart.length)return;
+let id="ORD"+Date.now();
 let total=cart.reduce((a,b)=>a+b.price,0);
-
-alert("Processing payment...");
-
+alert("Processing...");
 setTimeout(()=>{
 if(!orders[user])orders[user]=[];
-orders[user].push({orderId,total,items:[...cart]});
+orders[user].push({id,total});
 localStorage.setItem("orders",JSON.stringify(orders));
-cart=[];
-updateCart();
-renderOrders();
-alert("Payment Success! Order ID: "+orderId);
-},1500);
+cart=[];updateCart();renderOrders();alert("Order: "+id);
+},1000);
 }
 
-function renderOrders(){
-let box=document.getElementById("orders");
-box.innerHTML="";
+function renderOrders(){let box=document.getElementById("orders");box.innerHTML="";
 if(!orders[user])return;
-orders[user].forEach(o=>{
-box.innerHTML+=`<p>🧾 ${o.orderId} | ₹${o.total}</p>`;
-});
+orders[user].forEach(o=>box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`);
 }
 
 function toggleMode(){document.body.classList.toggle("dark");}
-
-function toast(){document.getElementById("toast").style.display="block";setTimeout(()=>document.getElementById("toast").style.display="none",1000);}
-
 function openAuth(){document.getElementById("authModal").style.display="flex";}
+function closeAuth(){document.getElementById("authModal").style.display="none";}
+function openAdmin(){document.getElementById("adminModal").style.display="flex";}
+function closeAdmin(){document.getElementById("adminModal").style.display="none";}
+
+function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").innerText=isLogin?"Login":"Register";}
 
 function login(){
 let e=document.getElementById("email").value;
 let p=document.getElementById("pass").value;
-
-if((e=="admin" && p=="admin123") || (e && p)){
-user=e;
-localStorage.setItem("user",e);
-document.getElementById("authModal").style.display="none";
-updateUI();
-}else alert("Invalid login");
+if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();}
+else alert("Invalid");
 }
 
 function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
-
-function openAdmin(){document.getElementById("adminModal").style.display="flex";}
 
 function addProduct(){
 let n=document.getElementById("pname").value;
 let p=document.getElementById("pprice").value;
 let i=document.getElementById("pimg").value;
 let d=document.getElementById("pdesc").value;
-
-products.push({name:n,price:Number(p),img:i,desc:d});
+products.push({name:n,price:+p,img:i,desc:d});
 localStorage.setItem("products",JSON.stringify(products));
-renderProducts();
-alert("Product Added");
+renderProducts();alert("Added");
 }
 
 </script></body>
