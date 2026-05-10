@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CodeAlpha Store - FULL STACK PRO</title><style>
+<title>CodeAlpha Store - PRO DEMO</title><style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#f4f4f4;transition:0.3s;}
 .dark{background:#111;color:white;}
@@ -69,11 +69,11 @@ position:relative;
 
 </style></head>
 <body><nav>
-<h1>🛒 CodeAlpha FULL STACK</h1><div class="right">
+<h1>🛒 CodeAlpha Store</h1><div class="right">
 <input id="search" placeholder="Search products" onkeyup="renderProducts()" />
 <button onclick="toggleMode()">🌙</button>
 <button onclick="openAuth()">Login/Register</button>
-<button onclick="openAdmin()">Admin</button>
+<button onclick="openAdmin()" id="adminBtn" style="display:none;">Admin</button>
 <span id="user"></span>
 <button>🛍 <span id="count">0</span></button>
 </div>
@@ -81,31 +81,47 @@ position:relative;
 
 <section class="hero">
 <h2>Full Stack E-Commerce System</h2>
-<p>Professional Admin Dashboard • Secure Ordering</p> 
+<p>Professional Admin Dashboard • Secure Ordering</p>
 </section>
 
-<div class="container" id="productList"></div><div class="section">
+<div class="container" id="productList"></div>
+
+<div class="section">
 <h2>Cart</h2>
 <ul id="cartItems"></ul>
 <p>Total: ₹<span id="total">0</span></p>
-<button onclick="checkout()">Checkout (Mock)</button>
-</div><div class="section">
-<h2>Orders</h2>
-<div id="orders"></div>
-</div><footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer><div class="toast" id="toast">Success ✔</div><div class="modal" id="authModal">
+<button onclick="checkout()">Proceed to Checkout</button>
+</div>
+
+<div class="section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2>Order History</h2>
+        <button id="clearBtn" onclick="clearOrders()" style="display:none; background:red; color:white; border:none; padding:5px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:bold;">Clear History</button>
+    </div>
+    <div id="orders"></div>
+</div>
+
+<footer style="text-align:center;padding:20px;">© 2026 CodeAlpha Full Stack</footer>
+
+<div class="toast" id="toast">Success ✔</div>
+
+<div class="modal" id="authModal">
 <div class="modal-content">
 <span class="close" onclick="closeAuth()">✖</span>
 <h3 id="authTitle">Login</h3>
 <input id="email" placeholder="Username" />
 <input id="pass" type="password" placeholder="Password" />
 <button onclick="login()">Submit</button>
-<p onclick="toggleAuth()" style="cursor:pointer;color:blue">Switch Login/Register</p><div class="sample">
+<p onclick="toggleAuth()" style="cursor:pointer;color:blue; margin-top:10px;">Switch Login/Register</p>
+<div class="sample">
 <b>Sample Login</b><br>
 Username: admin<br>
 Password: admin123
 </div>
 </div>
-</div><div class="modal" id="adminModal">
+</div>
+
+<div class="modal" id="adminModal">
 <div class="modal-content">
 <span class="close" onclick="closeAdmin()">✖</span>
 <h3>Admin Panel</h3>
@@ -115,13 +131,15 @@ Password: admin123
 <input id="pdesc" placeholder="Description" />
 <button onclick="addProduct()">Add Product</button>
 </div>
-</div><script>
+</div>
 
+<script>
 let products = JSON.parse(localStorage.getItem("products")) || [
 {name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness smartwatch"},
 {name:"Headphones",price:999,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"}
 ];
 
+// Force remove camera if it exists in local storage
 products = products.filter(p => p.name.toLowerCase() !== "camera");
 localStorage.setItem("products", JSON.stringify(products));
 
@@ -144,11 +162,11 @@ function renderProducts(){
         <div class='product'>
         <img src='${safeImg}' onerror="this.src='https://placehold.co/260x200?text=Image+Error'"/>
         <div class='product-content'>
-        <h3>${p.name}</h3>
-        <p class='desc'>${p.desc}</p>
-        <p class='price'>₹${p.price}</p>
-        <button class='btn cart-btn' onclick='add(${i})'>Add</button>
-        <button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>
+            <h3>${p.name}</h3>
+            <p class='desc'>${p.desc}</p>
+            <p class='price'>₹${p.price}</p>
+            <button class='btn cart-btn' onclick='add(${i})'>Add</button>
+            ${user === 'admin' ? `<button class='btn delete-btn' onclick='deleteProduct(${i})'>Delete</button>` : ''}
         </div></div>`;
     });
 }
@@ -172,25 +190,37 @@ function updateCart(){
 
 function checkout(){
     if(!cart.length) return;
-    
     let id = "ORD" + Date.now();
     let total = cart.reduce((a,b) => a + b.price, 0);
-    
     if(!orders[user]) orders[user] = [];
     orders[user].push({id, total});
     localStorage.setItem("orders", JSON.stringify(orders));
-    
     cart = [];
     updateCart();
     renderOrders();
-    
     alert("Order is placed and payment is successful!\nOrder ID: " + id);
 }
 
 function renderOrders(){
-    let box=document.getElementById("orders");box.innerHTML="";
-    if(!orders[user])return;
-    orders[user].forEach(o=>box.innerHTML+=`<p>🧾 ${o.id} | ₹${o.total}</p>`);
+    let box=document.getElementById("orders");
+    box.innerHTML="";
+    if(!orders[user] || orders[user].length === 0) {
+        box.innerHTML = "<p style='color:grey; font-style:italic;'>No orders in history.</p>";
+        return;
+    }
+    // Render from newest to oldest
+    [...orders[user]].reverse().forEach(o => {
+        let displayId = o.id ? o.id : "N/A";
+        box.innerHTML += `<p style='margin-bottom:5px;'>🧾 ${displayId} | ₹${o.total}</p>`;
+    });
+}
+
+function clearOrders() {
+    if(confirm("Wipe all order history?")) {
+        orders[user] = [];
+        localStorage.setItem("orders", JSON.stringify(orders));
+        renderOrders();
+    }
 }
 
 function toggleMode(){document.body.classList.toggle("dark");}
@@ -198,17 +228,27 @@ function openAuth(){document.getElementById("authModal").style.display="flex";}
 function closeAuth(){document.getElementById("authModal").style.display="none";}
 function openAdmin(){document.getElementById("adminModal").style.display="flex";}
 function closeAdmin(){document.getElementById("adminModal").style.display="none";}
-
 function toggleAuth(){isLogin=!isLogin;document.getElementById("authTitle").innerText=isLogin?"Login":"Register";}
 
 function login(){
     let e=document.getElementById("email").value;
     let p=document.getElementById("pass").value;
-    if((e=="admin"&&p=="admin123")||e){user=e;localStorage.setItem("user",e);closeAuth();updateUI();renderOrders();}
-    else alert("Invalid Credentials");
+    if((e=="admin"&&p=="admin123")||e){
+        user=e;
+        localStorage.setItem("user",e);
+        closeAuth();
+        updateUI();
+        renderOrders();
+        renderProducts();
+    } else alert("Invalid Credentials");
 }
 
-function updateUI(){document.getElementById("user").innerText=user?"👤 "+user:"";}
+function updateUI(){
+    const isAdmin = (user === "admin");
+    document.getElementById("user").innerText = user ? "👤 " + user : "";
+    document.getElementById("adminBtn").style.display = isAdmin ? "block" : "none";
+    document.getElementById("clearBtn").style.display = isAdmin ? "block" : "none";
+}
 
 function addProduct(){
     let n=document.getElementById("pname").value.trim();
@@ -217,10 +257,9 @@ function addProduct(){
     let d=document.getElementById("pdesc").value.trim();
 
     if(!n || !p || p <= 0) {
-        alert("Please enter a valid Product Name and Price greater than 0.");
+        alert("Enter a valid name and price.");
         return;
     }
-    
     if(!i) i = "https://placehold.co/260x200?text=No+Image";
 
     products.push({name:n,price:+p,img:i,desc:d});
@@ -235,6 +274,5 @@ function addProduct(){
     alert("Product Added Successfully");
     closeAdmin();
 }
-
 </script></body>
 </html>
