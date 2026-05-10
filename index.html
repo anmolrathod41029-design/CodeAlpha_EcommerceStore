@@ -23,7 +23,7 @@
         }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); cursor: pointer; text-transform: uppercase; }
         .nav-right { display: flex; gap: 12px; align-items: center; }
-        nav input { padding: 10px 18px; border-radius: 25px; border: none; width: 250px; background: rgba(255,255,255,0.1); color: white; outline: none; }
+        nav input { padding: 10px 18px; border-radius: 25px; border: none; width: 220px; background: rgba(255,255,255,0.1); color: white; outline: none; }
 
         .page { display: none; padding: 40px 5%; animation: fadeIn 0.4s ease; }
         .active-page { display: block; }
@@ -34,7 +34,7 @@
         .card img { width: 100%; height: 230px; object-fit: cover; display: block; background: #eee; }
         .card-body { padding: 20px; }
         .price { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        .desc { font-size: 0.85rem; color: #666; margin-bottom: 15px; min-height: 40px; line-height: 1.4; }
+        .desc { font-size: 0.85rem; color: #666; margin-bottom: 15px; min-height: 40px; }
 
         .btn { padding: 12px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
@@ -44,12 +44,11 @@
         .box { background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); max-width: 550px; margin: 0 auto; }
         input, textarea, select { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; background: var(--card); color: var(--text); }
 
-        .history-item { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); text-align: left; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; background: var(--success); color: white; }
-
         #loading { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid #ddd; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .history-item { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); text-align: left; }
     </style>
 </head>
 <body>
@@ -57,7 +56,7 @@
 <nav>
     <div class="logo" onclick="showPage('home')">EliteCommerce</div>
     <div class="nav-right">
-        <input type="text" id="search" placeholder="Search premium tech..." onkeyup="renderProducts()">
+        <input type="text" id="search" placeholder="Search tech..." onkeyup="renderProducts()">
         <button class="btn" style="background:none; color:white;" onclick="toggleTheme()">🌓</button>
         <button class="btn btn-primary" onclick="checkAuth('cart')">🛒 Cart: <span id="cart-count">0</span></button>
         <button class="btn btn-outline" style="border-color:white; color:white;" onclick="checkAuth('history')">📜 Orders</button>
@@ -73,13 +72,13 @@
         <input type="text" id="auth-user" placeholder="Username">
         <input type="password" id="auth-pass" placeholder="Password">
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="handleAuth()">Login</button>
-        <p style="font-size: 0.8rem; margin-top: 10px; color: #888;">Default Login: <b>admin</b> / <b>123</b></p>
-        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">New? Create an account</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; color: #888;">Test: <b>admin</b> / <b>123</b></p>
+        <p onclick="toggleAuthMode()" style="text-align:center; margin-top:15px; cursor:pointer; color:var(--primary);">Register New Account</p>
     </div>
 </div>
 
 <div id="home" class="page active-page">
-    <h2 style="text-align: center; margin-bottom: 20px;">Curated Technology</h2>
+    <h2 style="text-align: center; margin-bottom: 20px;">Verified Premium Collection</h2>
     <div class="grid" id="product-grid"></div>
 </div>
 
@@ -88,7 +87,7 @@
         <h2>Order Summary</h2>
         <div id="cart-items-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;"></div>
         <hr><br>
-        <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.2rem;"><span>Grand Total</span><b id="sum-total">₹0</b></div>
+        <div style="display:flex; justify-content:space-between; font-weight: 800; font-size: 1.2rem;"><span>Total</span><b id="sum-total">₹0</b></div>
         <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="showPage('details')">Delivery Details →</button>
     </div>
 </div>
@@ -96,16 +95,16 @@
 <div id="details" class="page">
     <div class="box">
         <h2>Shipping Information</h2>
-        <input type="text" id="c-name" placeholder="Receiver Full Name">
+        <input type="text" id="c-name" placeholder="Full Name">
         <input type="email" id="c-email" placeholder="Email Address">
         <div style="display: flex; gap: 10px;">
             <input type="text" id="c-phone" placeholder="Primary Phone" style="flex: 1;">
-            <input type="text" id="c-alt" placeholder="Alt Phone" style="flex: 1;">
+            <input type="text" id="c-alt" placeholder="Alt Phone (Optional)" style="flex: 1;">
         </div>
         <textarea id="c-addr" placeholder="House No, Building, Area" rows="3"></textarea>
         <select id="c-type">
-            <option value="Residential">Residential (Home)</option>
-            <option value="Office">Office / Workplace</option>
+            <option value="Home">Residential (Home)</option>
+            <option value="Office">Office / Work</option>
         </select>
         <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="validateDetails()">Continue to Payment</button>
     </div>
@@ -113,30 +112,30 @@
 
 <div id="payment" class="page">
     <div class="box">
-        <h2>Payment Method</h2>
+        <h2>Payment</h2>
         <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
-            <input type="radio" name="pm" value="UPI" checked> Instant UPI Transfer
+            <input type="radio" name="pm" value="UPI" checked> Instant UPI
         </label>
         <label style="display:block; padding:15px; border:1px solid #ddd; border-radius:10px; margin:10px 0; cursor: pointer;">
             <input type="radio" name="pm" value="COD"> Cash on Delivery
         </label>
-        <button class="btn btn-primary" style="width: 100%;" onclick="processOrder()">Place Order</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="processOrder()">Confirm Order</button>
     </div>
 </div>
 
 <div id="history" class="page">
     <div style="display:flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 30px;">
         <h2>Order History</h2>
-        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 8px 15px; font-size: 0.8rem;" onclick="clearHistory()">Clear History</button>
+        <button id="clear-btn" class="btn btn-danger" style="display:none; padding: 5px 15px;" onclick="clearHistory()">Clear History</button>
     </div>
     <div id="order-history-list" style="max-width: 800px; margin: 0 auto;"></div>
 </div>
 
 <div id="success" class="page">
     <div class="box" style="text-align:center;">
-        <h1 style="color:var(--success)">🎉 Order Success!</h1>
-        <p>A confirmation email has been sent. Track ID: <b id="final-tid"></b></p>
-        <button class="btn btn-primary" style="margin-top: 20px;" onclick="showPage('home')">Return to Store</button>
+        <h1 style="color:var(--success)">🎉 Order Confirmed!</h1>
+        <p>Reference ID: <b id="final-tid"></b></p>
+        <button class="btn btn-primary" style="margin-top: 20px;" onclick="showPage('home')">Continue Shopping</button>
     </div>
 </div>
 
@@ -144,16 +143,21 @@
 const sampleUsers = {"admin": "123"};
 let users = JSON.parse(localStorage.getItem("users")) || sampleUsers;
 
-// VERIFIED PRODUCTS: NO PLACEHOLDERS, ONLY REAL LINKS
+// 13 VERIFIED HIGH-QUALITY TECH PRODUCTS
 const products = [
-    { id: 1, name: "Precision Pro Laptop", price: 74999, img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800", desc: "M3 chip performance, 16GB Unified memory." },
-    { id: 2, name: "Elite Wireless Pods", price: 12499, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", desc: "Studio audio with Active Noise Cancellation." },
-    { id: 3, name: "Smart Fitness Watch", price: 6999, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800", desc: "Health tracking with oxygen and heart rate sensors." },
-    { id: 4, name: "Cinema 4K Cam", price: 42000, img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800", desc: "4K cinematic video with AI stabilization." },
-    { id: 5, name: "Mechanical RGB Key", price: 4500, img: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=800", desc: "Tactile response with full RGB backlighting." },
-    { id: 6, name: "Titan Gaming Mouse", price: 2999, img: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800", desc: "Precision sensor with customizable DPI." },
-    { id: 7, name: "Premium VR Headset", price: 28500, img: "https://images.unsplash.com/photo-1622979135225-d2ba2697133e?w=800", desc: "Fully immersive 3D spatial virtual reality." },
-    { id: 8, name: "Lumina Smart Lamp", price: 1800, img: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=800", desc: "App-controlled 16M color smart lighting." }
+    { id: 1, name: "Elite Pro Laptop", price: 74999, img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800", desc: "M2 Chip, 16GB RAM, 512GB SSD" },
+    { id: 2, name: "Noise-Cancel Pods", price: 12499, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800", desc: "Studio Audio with ANC" },
+    { id: 3, name: "Smart Fitness Watch", price: 6999, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800", desc: "AMOLED Display, Heart Tracker" },
+    { id: 4, name: "4K Action Camera", price: 42000, img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800", desc: "Ultra HD Cinema Recording" },
+    { id: 5, name: "Mechanical Keyboard", price: 4500, img: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=800", desc: "RGB Backlit Tactile Switches" },
+    { id: 6, name: "Precision Mouse", price: 2999, img: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=800", desc: "16k DPI Optical Sensor" },
+    { id: 7, name: "Smart Table Lamp", price: 1800, img: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=800", desc: "App Controlled RGB Lighting" },
+    { id: 8, name: "Premium VR Headset", price: 28500, img: "https://images.unsplash.com/photo-1622979135225-d2ba2697133e?w=800", desc: "Immersive 3D Spatial Audio" },
+    { id: 9, name: "UltraWide Monitor", price: 34000, img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800", desc: "34-inch Curved IPS Panel" },
+    { id: 10, name: "Wireless Speaker", price: 5500, img: "https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=800", desc: "Deep Bass 360 Surround" },
+    { id: 11, name: "Mirrorless Camera", price: 89000, img: "https://images.unsplash.com/photo-1510127034890-ba27508e9f1c?w=800", desc: "Full Frame Professional Sensor" },
+    { id: 12, name: "Tablet Air Pro", price: 54000, img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800", desc: "Pencil Support, 120Hz Liquid Retina" },
+    { id: 13, name: "Smart Home Hub", price: 9500, img: "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=800", desc: "Centralized AI Voice Control" }
 ];
 
 let cart = [];
@@ -166,11 +170,12 @@ function renderProducts() {
     const q = document.getElementById("search").value.toLowerCase();
     grid.innerHTML = "";
     
+    // Strict Filter: Card only renders if the image object exists and loads
     products.filter(p => p.name.toLowerCase().includes(q)).forEach(p => {
         const inCart = cart.some(c => c.id === p.id);
         grid.innerHTML += `
             <div class="card">
-                <img src="${p.img}" loading="lazy" onerror="this.parentElement.style.display='none'">
+                <img src="${p.img}" onerror="this.parentElement.style.display='none'">
                 <div class="card-body">
                     <h3>${p.name}</h3>
                     <p class="desc">${p.desc}</p>
@@ -188,32 +193,30 @@ function addToCart(id) {
     if(!currentUser) return showPage('auth');
     if(!cart.some(c => c.id === id)) {
         cart.push(products.find(p => p.id === id));
-        updateCart();
-        renderProducts();
+        updateCart(); renderProducts();
     }
 }
 
 function removeFromCart(id) {
     cart = cart.filter(c => c.id !== id);
-    updateCart();
-    renderProducts();
+    updateCart(); renderProducts();
 }
 
 function updateCart() {
     document.getElementById("cart-count").innerText = cart.length;
     let list = document.getElementById("cart-items-list");
     let total = cart.reduce((acc, item) => acc + item.price, 0);
-    list.innerHTML = cart.length ? cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('') : "<p style='text-align:center'>Cart is empty</p>";
+    list.innerHTML = cart.length ? cart.map(i => `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><span>${i.name}</span><b>₹${i.price}</b></div>`).join('') : "<p style='text-align:center'>Cart is empty.</p>";
     document.getElementById("sum-total").innerText = "₹" + total;
 }
 
 function validateDetails() {
-    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("Fill Name, Phone, and Address!");
+    if(!document.getElementById("c-name").value || !document.getElementById("c-phone").value || !document.getElementById("c-addr").value) return alert("Please fill Name, Phone, and Address!");
     showPage('payment');
 }
 
 function processOrder() {
-    const tid = "TXN-" + Date.now();
+    const tid = "ID-" + Date.now();
     const order = { id: tid, date: new Date().toLocaleDateString(), total: document.getElementById("sum-total").innerText, count: cart.length, type: document.getElementById("c-type").value };
     document.getElementById("loading").style.display = "flex";
     setTimeout(() => {
@@ -234,11 +237,11 @@ function renderHistory() {
     if(!currentUser || !allOrders[currentUser] || allOrders[currentUser].length === 0) { btn.style.display = "none"; return list.innerHTML = "<p style='text-align:center'>No orders yet.</p>"; }
     btn.style.display = "block";
     allOrders[currentUser].slice().reverse().forEach(o => {
-        list.innerHTML += `<div class="history-item"><div style="display:flex; justify-content:space-between"><b>Order #${o.id}</b><span class="status-badge">Processing</span></div><p>Qty: ${o.count} | Amount: ${o.total}</p><small>${o.date} - ${o.type}</small></div>`;
+        list.innerHTML += `<div class="history-item"><div style="display:flex; justify-content:space-between"><b>Order #${o.id}</b><span class="status-badge">${o.type}</span></div><p>Qty: ${o.count} | Amount: ${o.total}</p><small>${o.date} - Dispatched</small></div>`;
     });
 }
 
-function clearHistory() { if(confirm("Delete history?")) { allOrders[currentUser] = []; localStorage.setItem("orders", JSON.stringify(allOrders)); renderHistory(); } }
+function clearHistory() { if(confirm("Clear history?")) { allOrders[currentUser] = []; localStorage.setItem("orders", JSON.stringify(allOrders)); renderHistory(); } }
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); if(id === 'history') renderHistory(); if(id === 'home') renderProducts(); window.scrollTo(0,0); }
 function toggleTheme() { document.body.classList.toggle("dark-mode"); }
 function handleAuth() { const u = document.getElementById("auth-user").value; const p = document.getElementById("auth-pass").value; if(isLoginMode) { if(users[u] && users[u] === p) login(u); else alert("Invalid Login"); } else { if(users[u]) return alert("User exists"); users[u] = p; localStorage.setItem("users", JSON.stringify(users)); login(u); } }
