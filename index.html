@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>CodeAlpha Store - Final Clean Version</title>
+<title>CodeAlpha Store - Clean Version</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
@@ -63,13 +63,12 @@ text-align:center;
 padding:50px 20px;
 }
 
-/* ✅ FIXED GRID (NO OVERLAP) */
+/* GRID FIX */
 .container{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 gap:20px;
 padding:25px;
-align-items:stretch;
 }
 
 /* PRODUCT CARD */
@@ -86,7 +85,6 @@ flex-direction:column;
 width:100%;
 height:180px;
 object-fit:cover;
-display:block;
 }
 
 .product-content{
@@ -98,7 +96,6 @@ flex:1;
 .price{
 color:green;
 font-weight:bold;
-font-size:18px;
 }
 
 .desc{
@@ -114,20 +111,13 @@ border:none;
 border-radius:8px;
 cursor:pointer;
 font-weight:bold;
-margin-top:5px;
+margin:4px;
 }
 
-.cart-btn{
-background:green;
-color:white;
-}
+.cart-btn{background:green;color:white;}
+.del-btn{background:red;color:white;}
 
-.del-btn{
-background:red;
-color:white;
-}
-
-/* SECTIONS */
+/* CART SECTION */
 .section{
 background:white;
 margin:20px;
@@ -168,7 +158,6 @@ padding:8px;
 margin:5px 0;
 }
 
-/* SAMPLE BOX */
 .sample{
 margin-top:10px;
 background:#f2f2f2;
@@ -198,8 +187,8 @@ font-size:13px;
 
 <!-- HERO -->
 <section class="hero">
-<h1>Final E-Commerce Project</h1>
-<p>Clean UI • No Overlap • Full Working System</p>
+<h1>Simple E-Commerce Store</h1>
+<p>Clean UI • Only 5 Products • Fully Working</p>
 </section>
 
 <!-- PRODUCTS -->
@@ -249,22 +238,19 @@ Password: admin123
 
 <script>
 
+/* ✅ ONLY 5 PRODUCTS */
 let products = JSON.parse(localStorage.getItem("products")) || [
+
 {name:"Smart Watch",price:1999,img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",desc:"Fitness tracking smartwatch"},
-{name:"Headphones",price:1499,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling audio"},
-{name:"Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Comfortable running shoes"},
-{name:"Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",desc:"High performance smartphone"},
-{name:"Laptop",price:45999,img:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",desc:"Powerful laptop"},
-{name:"Mouse",price:799,img:"https://images.unsplash.com/photo-1527814050087-3793815479db?w=500",desc:"Gaming mouse"},
-{name:"Keyboard",price:999,img:"https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500",desc:"Mechanical keyboard"},
-{name:"Backpack",price:699,img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500",desc:"Travel backpack"},
-{name:"Speaker",price:1299,img:"https://images.unsplash.com/photo-1589003077984-894e133dabab?w=500",desc:"Bluetooth speaker"},
-{name:"TV",price:27999,img:"https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=500",desc:"4K Smart TV"},
-{name:"Watch",price:999,img:"https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=500",desc:"Classic watch"},
-{name:"Perfume",price:899,img:"https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500",desc:"Long lasting fragrance"},
-{name:"Camera",price:32999,img:"https://images.unsplash.com/photo-1519183071298-a2962be96f83?w=500",desc:"DSLR camera"},
-{name:"Sunglasses",price:499,img:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500",desc:"UV protection glasses"},
-{name:"Smart Band",price:1299,img:"https://images.unsplash.com/photo-1510017803434-a899398421b3?w=500",desc:"Fitness tracker"}
+
+{name:"Headphones",price:1499,img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",desc:"Noise cancelling headphones"},
+
+{name:"Running Shoes",price:2499,img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",desc:"Comfortable running shoes"},
+
+{name:"Smart Phone",price:14999,img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",desc:"High performance camera phone"},
+
+{name:"Laptop",price:45999,img:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500",desc:"Powerful laptop for work"}
+
 ];
 
 let cart=[];
@@ -273,6 +259,7 @@ let user=localStorage.getItem("user");
 renderProducts();
 updateUI();
 
+/* RENDER */
 function renderProducts(){
 let box=document.getElementById("products");
 let s=document.getElementById("search").value.toLowerCase();
@@ -294,6 +281,7 @@ box.innerHTML+=`
 });
 }
 
+/* CART */
 function add(i){
 if(!user)return alert("Login required");
 cart.push(products[i]);
@@ -321,17 +309,19 @@ document.getElementById("cart").innerHTML+=`<li>${c.name} ₹${c.price}</li>`;
 document.getElementById("total").innerText=t;
 }
 
+/* CHECKOUT */
 function checkout(){
-alert("Order placed!");
+alert("Order placed successfully!");
 cart=[];
 update();
 }
 
+/* DARK MODE */
 function toggle(){
 document.body.classList.toggle("dark");
 }
 
-/* AUTH */
+/* LOGIN */
 function openAuth(){document.getElementById("auth").style.display="flex";}
 function closeAuth(){document.getElementById("auth").style.display="none";}
 
@@ -339,7 +329,7 @@ function closeAuth(){document.getElementById("auth").style.display="none";}
 function openAdmin(){document.getElementById("admin").style.display="flex";}
 function closeAdmin(){document.getElementById("admin").style.display="none";}
 
-/* LOGIN */
+/* AUTH */
 function login(){
 let u=document.getElementById("u").value;
 let p=document.getElementById("p").value;
@@ -372,4 +362,4 @@ alert("Product Added");
 </script>
 
 </body>
-</html>
+  </html>
